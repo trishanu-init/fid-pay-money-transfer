@@ -1,10 +1,15 @@
 package com.fidelity.moneytransfer.service;
 
+import com.fidelity.moneytransfer.domain.TransactionLog;
 import com.fidelity.moneytransfer.dto.AccountResponse;
 import com.fidelity.moneytransfer.dto.TransferRequest;
 import com.fidelity.moneytransfer.dto.TransferResponse;
 
+import java.math.BigDecimal;
+import java.util.List;
+
 public interface AccountService {
-    TransferResponse transferMoney(TransferRequest request);
     AccountResponse getAccountDetails(Long accountId);
+    BigDecimal getBalance(Long accountId);
+    List<TransactionLog> getTransactionHistory(Long accountId);
 }

@@ -4,6 +4,7 @@ import com.fidelity.moneytransfer.domain.TransactionLog;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.UUID;
 
 @Repository
@@ -11,4 +12,5 @@ public interface TransactionLogRepository extends JpaRepository<TransactionLog, 
 
     // Custom query method to check if a transaction with this key already exists
     boolean existsByIdempotencyKey(String idempotencyKey);
+    List<TransactionLog> findByFromAccountIdOrToAccountIdOrderByCreatedOnDesc(Long fromAccountId, Long toAccountId);
 }
