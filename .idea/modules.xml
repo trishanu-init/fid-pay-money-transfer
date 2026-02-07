@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/money-transfer-system.iml" filepath="$PROJECT_DIR$/money-transfer-system.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/fid-pay.iml" filepath="$PROJECT_DIR$/.idea/fid-pay.iml" />
     </modules>
   </component>
 </project>
