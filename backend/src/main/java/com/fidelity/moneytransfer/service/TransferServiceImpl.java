@@ -10,6 +10,7 @@ import com.fidelity.moneytransfer.exception.DuplicateTransferException;
 import com.fidelity.moneytransfer.repository.AccountRepository;
 import com.fidelity.moneytransfer.repository.TransactionLogRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,10 @@ public class TransferServiceImpl implements TransferService {
 
     private final AccountRepository accountRepository;
     private final TransactionLogRepository transactionLogRepository;
+    private final EmailService emailService ;
+
+    @Value("${app.notification.test-recipient}")
+    private String testRecipientEmail;
 
     @Override
     @Transactional
@@ -50,6 +55,13 @@ public class TransferServiceImpl implements TransferService {
         log.setCreatedOn(LocalDateTime.now());
 
         transactionLogRepository.save(log);
+
+        emailService.sendTransactionNotification(
+                testRecipientEmail,
+                log.getId().toString(),
+                request.amount(),
+                "SUCCESS"
+        );
 
         return new TransferResponse(
                 log.getId(),
