@@ -1,0 +1,272 @@
+// Google Fonts import
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+// Material Icons
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+
+// Angular Material styles
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+
+// ============================================
+// CSS Custom Properties (Design Tokens)
+// ============================================
+:root {
+  // Colors
+  --color-primary: #1976d2;
+  --color-primary-dark: #0d47a1;
+  --color-primary-light: #64b5f6;
+  --color-accent: #4caf50;
+  --color-warn: #f44336;
+  --color-success: #4caf50;
+  --color-error: #f44336;
+
+  // Background
+  --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --bg-card: #ffffff;
+  --bg-surface: #fafafa;
+  --bg-hover: rgba(25, 118, 210, 0.04);
+
+  // Text
+  --text-primary: rgba(0, 0, 0, 0.87);
+  --text-secondary: rgba(0, 0, 0, 0.6);
+  --text-disabled: rgba(0, 0, 0, 0.38);
+
+  // Spacing
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-xxl: 48px;
+
+  // Border Radius
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 50%;
+
+  // Shadows
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  --shadow-md: 0 3px 6px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.15), 0 3px 6px rgba(0, 0, 0, 0.10);
+  --shadow-xl: 0 15px 25px rgba(0, 0, 0, 0.15), 0 5px 10px rgba(0, 0, 0, 0.05);
+
+  // Transitions
+  --transition-fast: 150ms ease-in-out;
+  --transition-normal: 250ms ease-in-out;
+  --transition-slow: 350ms ease-in-out;
+
+  // Currency
+  --currency-symbol: '₹';
+}
+
+// ============================================
+// Global Styles
+// ============================================
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+  font-family: 'Inter', 'Roboto', 'Helvetica Neue', sans-serif;
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// Typography
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--text-primary);
+}
+
+h1 {
+  font-size: 2.5rem;
+}
+
+h2 {
+  font-size: 2rem;
+}
+
+h3 {
+  font-size: 1.5rem;
+}
+
+h4 {
+  font-size: 1.25rem;
+}
+
+h5 {
+  font-size: 1rem;
+}
+
+h6 {
+  font-size: 0.875rem;
+}
+
+p {
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+
+  &:hover {
+    color: var(--color-primary-dark);
+  }
+}
+
+// ============================================
+// Utility Classes
+// ============================================
+
+// Currency formatting
+.currency {
+  font-family: 'Inter', monospace;
+  font-weight: 600;
+
+  &::before {
+    content: var(--currency-symbol);
+    margin-right: 2px;
+  }
+}
+
+// Status badges
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+
+  &--success {
+    background-color: rgba(76, 175, 80, 0.15);
+    color: #2e7d32;
+  }
+
+  &--failed,
+  &--error {
+    background-color: rgba(244, 67, 54, 0.15);
+    color: #c62828;
+  }
+
+  &--pending {
+    background-color: rgba(255, 152, 0, 0.15);
+    color: #e65100;
+  }
+}
+
+// Transaction type
+.transaction-type {
+  font-weight: 600;
+  font-size: 0.875rem;
+
+  &--debit {
+    color: #c62828;
+  }
+
+  &--credit {
+    color: #2e7d32;
+  }
+}
+
+// Card elevation animation
+.card-hover {
+  transition: box-shadow var(--transition-normal), transform var(--transition-normal);
+
+  &:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+  }
+}
+
+// Loading state
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+// Responsive container
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-md);
+
+  @media (max-width: 600px) {
+    padding: 0 var(--spacing-sm);
+  }
+}
+
+// Action buttons group
+.action-buttons {
+  display: flex;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+
+  @media (max-width: 600px) {
+    flex-direction: column;
+    width: 100%;
+
+    button,
+    a {
+      width: 100%;
+    }
+  }
+}
+
+// Snackbar customization
+.mat-mdc-snack-bar-container {
+  &.success-snackbar {
+    --mdc-snackbar-container-color: #2e7d32;
+  }
+
+  &.error-snackbar {
+    --mdc-snackbar-container-color: #c62828;
+  }
+}
+
+// Form field spacing
+.form-row {
+  margin-bottom: var(--spacing-md);
+}
+
+// Responsive grid
+.responsive-grid {
+  display: grid;
+  gap: var(--spacing-lg);
+
+  @media (min-width: 600px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (min-width: 960px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
