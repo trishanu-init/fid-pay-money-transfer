@@ -10,7 +10,9 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Getter @Setter @NoArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor
 @Table(name = "ACCOUNTS")
 public class Account {
 
@@ -20,6 +22,9 @@ public class Account {
 
     @Column(nullable = false)
     private String holderName;
+
+    @Column(nullable = false)
+    private String email;
 
     @Column(nullable = false)
     private BigDecimal balance;
@@ -37,7 +42,6 @@ public class Account {
     public void updateTimestamp() {
         this.lastUpdated = LocalDateTime.now();
     }
-
 
     public void debit(BigDecimal amount) {
         if (this.status != AccountStatus.ACTIVE) {

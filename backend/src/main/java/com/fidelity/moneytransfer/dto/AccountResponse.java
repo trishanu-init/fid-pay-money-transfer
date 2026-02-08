@@ -5,9 +5,10 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public record AccountResponse(
-        Long accountId,
-        String holderName,
-        BigDecimal balance,
-        AccountStatus status,
-        LocalDateTime lastUpdated
-) {}
+                Long accountId,
+                String holderName,
+                String email,
+                BigDecimal balance,
+                AccountStatus status,
+                LocalDateTime lastUpdated) {
+}
