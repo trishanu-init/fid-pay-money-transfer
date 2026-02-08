@@ -30,16 +30,16 @@ public class EmailService {
 
             helper.setFrom(senderEmail);
             helper.setTo(toEmail);
-            helper.setSubject("Fidelity Money Transfer Update: " + status);
+            helper.setSubject("Fid-Pay Money Transfer Update: " + status);
 
             String htmlBody = String.format("""
                 <html>
                 <body>
                     <h2>Transaction Update</h2>
                     <p>Your transaction with ID <strong>%s</strong> has resulted in: <span style="color:green; font-weight:bold;">%s</span></p>
-                    <p><strong>Amount:</strong> $%.2f</p>
+                    <p><strong>Amount:</strong> ₹%.2f</p>
                     <br/>
-                    <p>Thank you for using Fidelity Money Transfer.</p>
+                    <p>Thank you for using Fid-Pay Money Transfer.</p>
                 </body>
                 </html>
                 """, transactionId, status, amount);
