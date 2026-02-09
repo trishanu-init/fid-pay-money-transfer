@@ -35,9 +35,6 @@
         <!-- Transfer Form Card -->
         <mat-card class="transfer-card" *ngIf="!isLoading && account">
             <mat-card-header>
-                <div class="card-header-icon">
-                    <mat-icon>send</mat-icon>
-                </div>
                 <mat-card-title>Send Money</mat-card-title>
                 <mat-card-subtitle>Transfer funds to another account</mat-card-subtitle>
             </mat-card-header>
@@ -76,9 +73,9 @@
                     <!-- Amount -->
                     <mat-form-field appearance="outline" class="full-width">
                         <mat-label>Amount</mat-label>
-                        <span matPrefix class="currency-prefix">₹&nbsp;</span>
                         <input matInput formControlName="amount" placeholder="0.00" type="number" step="0.01" min="0.01"
                             id="amount-input">
+                        <mat-icon matPrefix>currency_rupee</mat-icon>
                         <mat-error *ngIf="transferForm.get('amount')?.invalid">
                             {{ getAmountError() }}
                         </mat-error>

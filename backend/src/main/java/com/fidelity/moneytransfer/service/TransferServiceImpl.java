@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +23,8 @@ public class TransferServiceImpl implements TransferService {
         private final AccountRepository accountRepository;
         private final TransactionLogRepository transactionLogRepository;
         private final EmailService emailService;
+
+        private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a");
 
         @Override
         @Transactional
@@ -52,19 +55,33 @@ public class TransferServiceImpl implements TransferService {
 
                 transactionLogRepository.save(log);
 
+                String transactionDate = log.getCreatedOn().format(DATE_FORMATTER);
+
                 // Notify sender (money debited)
                 emailService.sendTransactionNotification(
                                 fromAccount.getEmail(),
-                                log.getId().toString(),
+                                fromAccount.getHolderName(),
+                                "DEBIT",
                                 request.amount(),
-                                "DEBIT");
+                                fromAccount.getId().toString(),
+                                fromAccount.getBalance(),
+                                transactionDate,
+                                toAccount.getHolderName(),
+                                toAccount.getId().toString(),
+                                log.getId().toString());
 
                 // Notify receiver (money credited)
                 emailService.sendTransactionNotification(
                                 toAccount.getEmail(),
-                                log.getId().toString(),
+                                toAccount.getHolderName(),
+                                "CREDIT",
                                 request.amount(),
-                                "CREDIT");
+                                toAccount.getId().toString(),
+                                toAccount.getBalance(),
+                                transactionDate,
+                                fromAccount.getHolderName(),
+                                fromAccount.getId().toString(),
+                                log.getId().toString());
 
                 return new TransferResponse(
                                 log.getId(),

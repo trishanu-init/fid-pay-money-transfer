@@ -8,10 +8,13 @@ import { AuthService } from '../../core/services/auth.service';
 import { AccountService } from '../../core/services/account.service';
 import { TransactionLog } from '../../core/models';
 
+export type TransactionFilter = 'all' | 'sent' | 'received';
+
 /**
  * History Component
  * 
  * Displays transaction history with:
+ * - Filter tabs for All/Sent/Received transactions
  * - Material table with sorting and pagination
  * - DEBIT/CREDIT type styling
  * - Status badges
@@ -25,10 +28,15 @@ import { TransactionLog } from '../../core/models';
 export class HistoryComponent implements OnInit, OnDestroy, AfterViewInit {
     displayedColumns = ['createdOn', 'type', 'amount', 'status'];
     dataSource = new MatTableDataSource<TransactionLog>([]);
+    allTransactions: TransactionLog[] = [];
     currentAccountId: number | null = null;
     isLoading = true;
     errorMessage = '';
     isMobile = false;
+
+    // Filter tab state
+    activeFilter: TransactionFilter = 'all';
+    transactionCounts = { all: 0, sent: 0, received: 0 };
 
     @ViewChild(MatPaginator) paginator!: MatPaginator;
     @ViewChild(MatSort) sort!: MatSort;
@@ -81,7 +89,9 @@ export class HistoryComponent implements OnInit, OnDestroy, AfterViewInit {
                     transactions.sort((a, b) =>
                         new Date(b.createdOn).getTime() - new Date(a.createdOn).getTime()
                     );
-                    this.dataSource.data = transactions;
+                    this.allTransactions = transactions;
+                    this.updateTransactionCounts();
+                    this.applyFilter(this.activeFilter);
                     this.isLoading = false;
                 },
                 error: (error) => {
@@ -90,6 +100,51 @@ export class HistoryComponent implements OnInit, OnDestroy, AfterViewInit {
                     console.error('Error loading transactions:', error);
                 }
             });
+    }
+
+    /**
+     * Update transaction counts for each filter tab
+     */
+    updateTransactionCounts(): void {
+        this.transactionCounts = {
+            all: this.allTransactions.length,
+            sent: this.allTransactions.filter(tx => this.getTransactionType(tx) === 'DEBIT').length,
+            received: this.allTransactions.filter(tx => this.getTransactionType(tx) === 'CREDIT').length
+        };
+    }
+
+    /**
+     * Apply filter to transactions
+     */
+    applyFilter(filter: TransactionFilter): void {
+        this.activeFilter = filter;
+
+        let filtered: TransactionLog[];
+        switch (filter) {
+            case 'sent':
+                filtered = this.allTransactions.filter(tx => this.getTransactionType(tx) === 'DEBIT');
+                break;
+            case 'received':
+                filtered = this.allTransactions.filter(tx => this.getTransactionType(tx) === 'CREDIT');
+                break;
+            default:
+                filtered = this.allTransactions;
+        }
+
+        this.dataSource.data = filtered;
+
+        // Reset paginator to first page when filter changes
+        if (this.paginator) {
+            this.paginator.firstPage();
+        }
+    }
+
+    /**
+     * Handle tab change event
+     */
+    onTabChange(index: number): void {
+        const filters: TransactionFilter[] = ['all', 'sent', 'received'];
+        this.applyFilter(filters[index]);
     }
 
     /**

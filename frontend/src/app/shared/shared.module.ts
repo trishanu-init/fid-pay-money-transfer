@@ -21,6 +21,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatRippleModule } from '@angular/material/core';
 import { MatBadgeModule } from '@angular/material/badge';
+import { MatTabsModule } from '@angular/material/tabs';
 
 // Shared Components
 import { LoadingSpinnerComponent } from './components/loading-spinner/loading-spinner.component';
@@ -45,7 +46,8 @@ const materialModules = [
     MatTooltipModule,
     MatDividerModule,
     MatRippleModule,
-    MatBadgeModule
+    MatBadgeModule,
+    MatTabsModule
 ];
 
 /**
