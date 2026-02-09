@@ -20,7 +20,7 @@ export interface ConfirmDialogData {
         <p>You are about to transfer:</p>
         <div class="transfer-summary">
           <div class="amount-display">
-            <span class="currency">₹</span>
+            <span class="currency"></span>
             <span class="amount">{{ data.amount | appCurrency:false }}</span>
           </div>
           <mat-icon class="arrow-icon">arrow_downward</mat-icon>

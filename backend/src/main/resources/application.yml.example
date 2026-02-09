@@ -36,8 +36,8 @@ spring:
   # Default Security Credentials for Local Testing
   security:
     user:
-      name: admin
-      password: admin
+      name: 
+      password: 
       roles: USER
 
 # Custom Application Properties
