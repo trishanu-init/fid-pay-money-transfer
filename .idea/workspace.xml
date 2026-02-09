@@ -5,11 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="64935ab2-9944-4b39-a9d0-7fe28fb72148" name="Changes" comment="feat:added otp service">
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sqldialects.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/fidelity/moneytransfer/service/EmailService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/fidelity/moneytransfer/service/EmailService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/fidelity/moneytransfer/service/TransferServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/fidelity/moneytransfer/service/TransferServiceImpl.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -112,7 +108,7 @@
       <workItem from="1770584276549" duration="614000" />
       <workItem from="1770585784198" duration="30000" />
       <workItem from="1770594616106" duration="1468000" />
-      <workItem from="1770599037508" duration="503000" />
+      <workItem from="1770599037508" duration="869000" />
     </task>
     <task id="LOCAL-00001" summary="feat:added otp service">
       <option name="closed" value="true" />

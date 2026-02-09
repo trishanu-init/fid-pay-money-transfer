@@ -51,6 +51,37 @@
                     Recent Transactions
                 </mat-card-title>
             </mat-card-header>
+
+            <!-- Filter Tabs -->
+            <mat-tab-group class="filter-tabs" (selectedIndexChange)="onTabChange($event)" animationDuration="200ms">
+                <mat-tab>
+                    <ng-template mat-tab-label>
+                        <span class="tab-label">
+                            All
+                            <span class="tab-count">{{ transactionCounts.all }}</span>
+                        </span>
+                    </ng-template>
+                </mat-tab>
+                <mat-tab>
+                    <ng-template mat-tab-label>
+                        <span class="tab-label">
+                            <mat-icon class="tab-icon sent">arrow_upward</mat-icon>
+                            Sent
+                            <span class="tab-count sent">{{ transactionCounts.sent }}</span>
+                        </span>
+                    </ng-template>
+                </mat-tab>
+                <mat-tab>
+                    <ng-template mat-tab-label>
+                        <span class="tab-label">
+                            <mat-icon class="tab-icon received">arrow_downward</mat-icon>
+                            Received
+                            <span class="tab-count received">{{ transactionCounts.received }}</span>
+                        </span>
+                    </ng-template>
+                </mat-tab>
+            </mat-tab-group>
+
             <mat-card-content>
                 <!-- Empty State -->
                 <div class="empty-state" *ngIf="dataSource.data.length === 0">
@@ -58,7 +89,6 @@
                     <h3>No transactions yet</h3>
                     <p>Your transaction history will appear here</p>
                     <button mat-raised-button color="primary" routerLink="/transfer">
-                        <mat-icon>send</mat-icon>
                         Make a Transfer
                     </button>
                 </div>
@@ -124,6 +154,28 @@
         <div class="mobile-transactions" *ngIf="!isLoading && !errorMessage && isMobile">
             <h2 class="section-title">Recent Transactions</h2>
 
+            <!-- Mobile Filter Tabs -->
+            <mat-tab-group class="filter-tabs mobile" (selectedIndexChange)="onTabChange($event)"
+                animationDuration="200ms">
+                <mat-tab>
+                    <ng-template mat-tab-label>
+                        <span class="tab-label">All <span class="tab-count">{{ transactionCounts.all }}</span></span>
+                    </ng-template>
+                </mat-tab>
+                <mat-tab>
+                    <ng-template mat-tab-label>
+                        <span class="tab-label">Sent <span class="tab-count sent">{{ transactionCounts.sent
+                                }}</span></span>
+                    </ng-template>
+                </mat-tab>
+                <mat-tab>
+                    <ng-template mat-tab-label>
+                        <span class="tab-label">Received <span class="tab-count received">{{ transactionCounts.received
+                                }}</span></span>
+                    </ng-template>
+                </mat-tab>
+            </mat-tab-group>
+
             <!-- Empty State -->
             <mat-card class="empty-card" *ngIf="dataSource.data.length === 0">
                 <mat-card-content class="empty-state">
@@ -131,7 +183,6 @@
                     <h3>No transactions yet</h3>
                     <p>Your transaction history will appear here</p>
                     <button mat-raised-button color="primary" routerLink="/transfer">
-                        <mat-icon>send</mat-icon>
                         Make a Transfer
                     </button>
                 </mat-card-content>
