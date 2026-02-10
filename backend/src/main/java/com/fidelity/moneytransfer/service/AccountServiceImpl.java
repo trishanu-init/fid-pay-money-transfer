@@ -19,6 +19,7 @@ public class AccountServiceImpl implements AccountService {
     private final AccountRepository accountRepository;
     private final TransactionLogRepository transactionLogRepository;
 
+
     @Override
     public AccountResponse getAccountDetails(Long accountId) {
         Account account = accountRepository.findById(accountId)
@@ -27,10 +28,10 @@ public class AccountServiceImpl implements AccountService {
         return new AccountResponse(
                 account.getId(),
                 account.getHolderName(),
-                account.getEmail(),
                 account.getBalance(),
                 account.getStatus(),
-                account.getLastUpdated());
+                account.getLastUpdated()
+        );
     }
 
     @Override

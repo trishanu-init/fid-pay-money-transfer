@@ -20,7 +20,6 @@ class AccountTest {
         account = new Account();
         account.setId(Long.valueOf(1L));
         account.setHolderName("John Doe");
-        account.setEmail("john.doe@example.com");
         account.setBalance(new BigDecimal("1000.00"));
         account.setStatus(AccountStatus.ACTIVE);
     }
