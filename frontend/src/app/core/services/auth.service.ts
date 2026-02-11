@@ -1,14 +1,15 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
-import { delay, tap } from 'rxjs/operators';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { HttpClient } from '@angular/common/http'; // Import HttpClient
+import { catchError, tap } from 'rxjs/operators';
 import { LoginCredentials, AuthResponse } from '../models';
 
 /**
  * Authentication Service
  * 
- * Handles user authentication using Basic Auth.
- * Stores credentials for HTTP interceptor to use.
+ * Handles user authentication and registration.
+ * Uses HTTP to interact with the backend for registration.
  */
 @Injectable({
     providedIn: 'root'
@@ -22,16 +23,18 @@ export class AuthService {
     /** Observable for authentication state changes */
     public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
 
-    constructor(private router: Router) { }
+    private apiUrl = 'http://localhost:9890/api/v1/auth'; // Your backend URL for registration
+
+    constructor(
+        private router: Router,
+        private http: HttpClient // Inject HttpClient for backend calls
+    ) { }
 
     /**
-     * Authenticate user with credentials
-     * Uses Basic Auth - stores credentials for HTTP interceptor
+     * Authenticate user with credentials (Using demo data)
      */
     login(credentials: LoginCredentials): Observable<AuthResponse> {
-        // For Basic Auth, we accept the credentials and store them
-        // The actual authentication happens on each API request
-        // Default valid user: admin/admin
+        // Demo users (without hitting the backend)
         const validUsers: Record<string, { password: string; userId: number }> = {
             'admin': { password: 'admin', userId: 1 },
             'user1': { password: 'password123', userId: 2 },
@@ -47,16 +50,28 @@ export class AuthService {
                 expiresIn: 86400 // 24 hours
             };
 
-            return of(response).pipe(
-                delay(500), // Simulate network delay
-                tap(res => this.handleAuthSuccess(credentials, res.userId))
-            );
+            return new Observable((observer) => {
+                observer.next(response);
+                observer.complete();
+            });
         }
 
-        return throwError(() => new Error('Invalid username or password')).pipe(
-            delay(300)
-        );
+        return throwError(() => new Error('Invalid username or password'));
     }
+
+    /**
+     * Register a new user by sending data to the backend
+     */
+    register(userData: { username: string, email: string, password: string }): Observable<AuthResponse> {
+        console.log('Sending registration data:', userData); // Log the data being sent
+        return this.http.post<AuthResponse>(`${this.apiUrl}/register`, userData).pipe(
+            tap((res: AuthResponse) => {
+                console.log('Registration response:', res); // Log response data
+                this.handleAuthSuccess(userData, res.userId);
+            }),
+            catchError(this.handleError)
+        );
+    }    
 
     /**
      * Log out current user and clear session
@@ -73,25 +88,6 @@ export class AuthService {
      */
     isAuthenticated(): boolean {
         return this.hasStoredCredentials();
-    }
-
-    /**
-     * Get Basic Auth header value
-     */
-    getBasicAuthHeader(): string | null {
-        const credentials = localStorage.getItem(this.CREDENTIALS_KEY);
-        if (!credentials) {
-            return null;
-        }
-        return `Basic ${credentials}`;
-    }
-
-    /**
-     * Get current user's account ID
-     */
-    getCurrentUserId(): number | null {
-        const userId = localStorage.getItem(this.USER_ID_KEY);
-        return userId ? parseInt(userId, 10) : null;
     }
 
     /**
@@ -116,5 +112,32 @@ export class AuthService {
      */
     private encodeBasicAuth(username: string, password: string): string {
         return btoa(`${username}:${password}`);
+    }
+
+    /**
+     * Error handler for HTTP requests
+     */
+    private handleError(error: any): Observable<never> {
+        console.error(error);
+        return throwError(() => new Error(error.message || 'An error occurred'));
+    }
+
+    /**
+     * Get Basic Auth header
+     */
+    getBasicAuthHeader(): string | null {
+        const credentials = localStorage.getItem(this.CREDENTIALS_KEY);
+        if (!credentials) {
+            return null;
+        }
+        return `Basic ${credentials}`;
+    }
+
+    /**
+     * Get current user's account ID
+     */
+    getCurrentUserId(): number | null {
+        const userId = localStorage.getItem(this.USER_ID_KEY);
+        return userId ? parseInt(userId, 10) : null;
     }
 }
