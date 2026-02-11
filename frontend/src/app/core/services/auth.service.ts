@@ -7,78 +7,67 @@ import { LoginCredentials, AuthResponse } from '../models';
 
 /**
  * Authentication Service
- * 
- * Handles user authentication and registration.
- * Uses HTTP to interact with the backend for registration.
+ *
+ * Handles user authentication and registration with JWT tokens.
+ * Uses HTTP to interact with the backend for login/registration.
  */
 @Injectable({
     providedIn: 'root'
 })
 export class AuthService {
-    private readonly CREDENTIALS_KEY = 'auth_credentials';
-    private readonly USER_ID_KEY = 'user_id';
+    private readonly TOKEN_KEY = 'jwt_token';
+    private readonly EMAIL_KEY = 'user_email';
+    private readonly ACCOUNT_ID_KEY = 'account_id';
+    private readonly EXPIRATION_KEY = 'token_expiration';
 
-    private isAuthenticatedSubject = new BehaviorSubject<boolean>(this.hasStoredCredentials());
+    private isAuthenticatedSubject = new BehaviorSubject<boolean>(this.hasValidToken());
 
     /** Observable for authentication state changes */
     public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
 
-    private apiUrl = 'http://localhost:9890/api/v1/auth'; // Your backend URL for registration
+    private apiUrl = 'http://localhost:9890/api/v1/auth'; // Backend URL for authentication
 
     constructor(
         private router: Router,
-        private http: HttpClient // Inject HttpClient for backend calls
+        private http: HttpClient
     ) { }
 
     /**
-     * Authenticate user with credentials (Using demo data)
+     * Authenticate user with credentials via backend API
      */
     login(credentials: LoginCredentials): Observable<AuthResponse> {
-        // Demo users (without hitting the backend)
-        const validUsers: Record<string, { password: string; userId: number }> = {
-            'admin': { password: 'admin', userId: 1 },
-            'user1': { password: 'password123', userId: 2 },
-            'user2': { password: 'password123', userId: 3 }
-        };
-
-        const user = validUsers[credentials.username];
-
-        if (user && user.password === credentials.password) {
-            const response: AuthResponse = {
-                token: this.encodeBasicAuth(credentials.username, credentials.password),
-                userId: user.userId,
-                expiresIn: 86400 // 24 hours
-            };
-
-            return new Observable((observer) => {
-                observer.next(response);
-                observer.complete();
-            });
-        }
-
-        return throwError(() => new Error('Invalid username or password'));
+        return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials).pipe(
+            tap((response: AuthResponse) => {
+                this.handleAuthSuccess(credentials, response);
+            }),
+            catchError((error) => {
+                return this.handleError(error);
+            })
+        );
     }
 
     /**
      * Register a new user by sending data to the backend
      */
     register(userData: { username: string, email: string, password: string }): Observable<AuthResponse> {
-        console.log('Sending registration data:', userData); // Log the data being sent
         return this.http.post<AuthResponse>(`${this.apiUrl}/register`, userData).pipe(
-            tap((res: AuthResponse) => {
-                console.log('Registration response:', res); // Log response data
-                this.handleAuthSuccess(userData, res.userId);
+            tap((response: AuthResponse) => {
+                this.handleAuthSuccess({ email: userData.email, password: userData.password }, response);
             }),
-            catchError(this.handleError)
+            catchError((error) => {
+                return this.handleError(error);
+            })
         );
-    }    
+    }
 
     /**
      * Log out current user and clear session
      */
     logout(): void {
-        localStorage.removeItem(this.CREDENTIALS_KEY);
-        localStorage.removeItem(this.USER_ID_KEY);
+        localStorage.removeItem(this.TOKEN_KEY);
+        localStorage.removeItem(this.EMAIL_KEY);
+        localStorage.removeItem(this.ACCOUNT_ID_KEY);
+        localStorage.removeItem(this.EXPIRATION_KEY);
         this.isAuthenticatedSubject.next(false);
         this.router.navigate(['/login']);
     }
@@ -87,57 +76,84 @@ export class AuthService {
      * Check if user is currently authenticated
      */
     isAuthenticated(): boolean {
-        return this.hasStoredCredentials();
+        return this.hasValidToken();
     }
 
     /**
-     * Handle successful authentication - store credentials
+     * Handle successful authentication - store JWT token
      */
-    private handleAuthSuccess(credentials: LoginCredentials, userId: number): void {
-        const encoded = this.encodeBasicAuth(credentials.username, credentials.password);
-        localStorage.setItem(this.CREDENTIALS_KEY, encoded);
-        localStorage.setItem(this.USER_ID_KEY, userId.toString());
+    private handleAuthSuccess(credentials: LoginCredentials, response: AuthResponse): void {
+        localStorage.setItem(this.TOKEN_KEY, response.token);
+        localStorage.setItem(this.EMAIL_KEY, response.email);
+        localStorage.setItem(this.ACCOUNT_ID_KEY, response.accountId.toString());
+        localStorage.setItem(this.EXPIRATION_KEY, (Date.now() + response.expiresIn).toString());
         this.isAuthenticatedSubject.next(true);
     }
 
     /**
-     * Check if credentials are stored
+     * Check if JWT token is valid and not expired
      */
-    private hasStoredCredentials(): boolean {
-        return !!localStorage.getItem(this.CREDENTIALS_KEY);
+    private hasValidToken(): boolean {
+        const token = localStorage.getItem(this.TOKEN_KEY);
+        const expiration = localStorage.getItem(this.EXPIRATION_KEY);
+
+        if (!token || !expiration) {
+            return false;
+        }
+
+        // Check if token is expired
+        return Date.now() < parseInt(expiration, 10);
     }
 
     /**
-     * Encode username:password for Basic Auth
+     * Get JWT Bearer token header
      */
-    private encodeBasicAuth(username: string, password: string): string {
-        return btoa(`${username}:${password}`);
-    }
-
-    /**
-     * Error handler for HTTP requests
-     */
-    private handleError(error: any): Observable<never> {
-        console.error(error);
-        return throwError(() => new Error(error.message || 'An error occurred'));
-    }
-
-    /**
-     * Get Basic Auth header
-     */
-    getBasicAuthHeader(): string | null {
-        const credentials = localStorage.getItem(this.CREDENTIALS_KEY);
-        if (!credentials) {
+    getAuthHeader(): string | null {
+        const token = localStorage.getItem(this.TOKEN_KEY);
+        if (!token) {
             return null;
         }
-        return `Basic ${credentials}`;
+        return `Bearer ${token}`;
+    }
+
+    /**
+     * Get current user's email
+     */
+    getCurrentUserEmail(): string | null {
+        return localStorage.getItem(this.EMAIL_KEY);
     }
 
     /**
      * Get current user's account ID
      */
     getCurrentUserId(): number | null {
-        const userId = localStorage.getItem(this.USER_ID_KEY);
-        return userId ? parseInt(userId, 10) : null;
+        const accountId = localStorage.getItem(this.ACCOUNT_ID_KEY);
+        return accountId ? parseInt(accountId, 10) : null;
+    }
+
+    /**
+     * Error handler for HTTP requests
+     */
+    private handleError(error: any): Observable<never> {
+        let errorMessage = 'An error occurred';
+
+        if (error.status === 401) {
+            errorMessage = 'Invalid credentials. Please check your email and password.';
+        } else if (error.status === 409) {
+            errorMessage = error.error?.message || 'Email already exists. Please use a different email.';
+        } else if (error.status === 400) {
+            if (error.error?.fieldErrors) {
+                // Extract field-level validation errors
+                const fieldErrors = error.error.fieldErrors;
+                errorMessage = fieldErrors.map((fe: any) => fe.message).join(', ');
+            } else {
+                errorMessage = error.error?.message || 'Invalid input. Please check your form.';
+            }
+        } else if (error.error?.message) {
+            errorMessage = error.error.message;
+        }
+
+        console.error('Auth error:', error);
+        return throwError(() => new Error(errorMessage));
     }
 }

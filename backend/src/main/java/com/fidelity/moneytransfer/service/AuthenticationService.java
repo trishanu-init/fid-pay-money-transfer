@@ -6,4 +6,5 @@ import com.fidelity.moneytransfer.dto.AccountCreateRequest;
 public interface AuthenticationService {
 	Account createUser(AccountCreateRequest account);
 	String login(String email, String password);
+	Account loginAndGetAccount(String email, String password);
 }

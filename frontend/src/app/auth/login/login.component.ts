@@ -5,7 +5,7 @@ import { AuthService } from '../../core/services/auth.service';
 
 /**
  * Login Component
- * 
+ *
  * Handles user authentication with username/password form.
  * Features gradient background, centered card layout, and error handling.
  */
@@ -28,8 +28,8 @@ export class LoginComponent implements OnInit {
         private route: ActivatedRoute
     ) {
         this.loginForm = this.fb.group({
-            username: ['', [Validators.required, Validators.minLength(3)]],
-            password: ['', [Validators.required, Validators.minLength(4)]]
+            email: ['', [Validators.required, Validators.email]],
+            password: ['', [Validators.required, Validators.minLength(6)]]
         });
     }
 
@@ -55,9 +55,9 @@ export class LoginComponent implements OnInit {
         this.isLoading = true;
         this.errorMessage = '';
 
-        const { username, password } = this.loginForm.value;
+        const { email, password } = this.loginForm.value;
 
-        this.authService.login({ username, password }).subscribe({
+        this.authService.login({ email, password }).subscribe({
             next: () => {
                 this.router.navigate([this.returnUrl]);
             },
@@ -78,15 +78,15 @@ export class LoginComponent implements OnInit {
     }
 
     /**
-     * Get error message for username field
+     * Get error message for email field
      */
-    getUsernameError(): string {
-        const control = this.loginForm.get('username');
+    getEmailError(): string {
+        const control = this.loginForm.get('email');
         if (control?.hasError('required')) {
-            return 'Username is required';
+            return 'Email is required';
         }
-        if (control?.hasError('minlength')) {
-            return 'Username must be at least 3 characters';
+        if (control?.hasError('email')) {
+            return 'Please enter a valid email address';
         }
         return '';
     }
@@ -100,7 +100,7 @@ export class LoginComponent implements OnInit {
             return 'Password is required';
         }
         if (control?.hasError('minlength')) {
-            return 'Password must be at least 4 characters';
+            return 'Password must be at least 6 characters';
         }
         return '';
     }

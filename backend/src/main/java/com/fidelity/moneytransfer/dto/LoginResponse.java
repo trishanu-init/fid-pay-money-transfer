@@ -13,4 +13,5 @@ public class LoginResponse {
     private String message;
     private String email;
     private Long expiresIn; // Token expiration in milliseconds
+    private Long accountId;
 }

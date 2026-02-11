@@ -39,6 +39,7 @@ public class Authentication {
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
         try {
         	log.info("Login request for email: {}", loginRequest.getEmail());
+            Account account = authService.loginAndGetAccount(loginRequest.getEmail(), loginRequest.getPassword());
             String token = authService.login(loginRequest.getEmail(), loginRequest.getPassword());
             
             LoginResponse response = new LoginResponse();
@@ -47,6 +48,7 @@ public class Authentication {
             response.setEmail(loginRequest.getEmail());
             response.setMessage("Login successful");
             response.setExpiresIn(tokenExpirationMs);
+            response.setAccountId(account.getId());
             
             log.info("Login successful for email: {}", loginRequest.getEmail());
             return ResponseEntity.ok(response);

@@ -65,4 +65,22 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         // Generate JWT token if credentials are valid
         return jwtUtil.generateToken(email);
     }
+
+    @Override
+    public Account loginAndGetAccount(String email, String password) {
+        Account account = accountRepository.findByEmail(email)
+                .orElseThrow(() -> {
+                    log.warn("Login attempt with non-existent email: {}", email);
+                    return new RuntimeException("Invalid email or password");
+                });
+
+        // Validate the password using BCrypt
+        if (!BCrypt.checkpw(password, account.getPassword())) {
+            log.warn("Failed login attempt for email: {}", email);
+            throw new RuntimeException("Invalid email or password");
+        }
+
+        log.info("User logged in successfully with account ID: {}", account.getId());
+        return account;
+    }
 }
