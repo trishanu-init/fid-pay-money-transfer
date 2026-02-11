@@ -1,4 +1,4 @@
-<div class="login-container">
+<div class="registration-container">
   <!-- Background decoration -->
   <div class="bg-decoration">
     <div class="circle circle-1"></div>
@@ -7,10 +7,10 @@
   </div>
 
   <!-- Registration Card -->
-  <mat-card class="login-card">
+  <mat-card class="registration-card">
     <mat-card-content>
       <!-- Logo & Title -->
-      <div class="login-header">
+      <div class="registration-header">
         <div class="logo-container">
           <mat-icon class="logo-icon">lock</mat-icon>
         </div>
@@ -25,7 +25,7 @@
       </div>
 
       <!-- Registration Form -->
-      <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()" class="login-form">
+      <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()" class="registration-form">
         <!-- Username Field -->
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Username</mat-label>
@@ -80,7 +80,7 @@
         </mat-form-field>
 
         <!-- Submit Button -->
-        <button mat-raised-button color="primary" class="login-button" type="submit" [disabled]="isLoading">
+        <button mat-raised-button color="primary" class="registration-button" type="submit" [disabled]="isLoading">
           <mat-spinner *ngIf="isLoading" diameter="20" [strokeWidth]="3"></mat-spinner>
           Register
         </button>
@@ -97,7 +97,7 @@
   </mat-card>
 
   <!-- Footer -->
-  <p class="login-footer">
+  <p class="registration-footer">
     &copy; 2026 Money Transfer System. Secure Banking.
   </p>
 </div>

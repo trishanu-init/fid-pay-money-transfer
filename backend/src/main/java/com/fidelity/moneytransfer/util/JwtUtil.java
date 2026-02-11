@@ -2,49 +2,79 @@ package com.fidelity.moneytransfer.util;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
-
-import org.springframework.stereotype.Service;
-
 import java.util.Date;
 
-@Service
+@Component
+@Slf4j
 public class JwtUtil {
 
-    // Ideally, store it in an env variable or a configuration file
-    private final SecretKey secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);  // Generates a new secret key for HS256 algorithm
+    @Value("${jwt.secret:your-256-bit-secret-key-change-this-in-production}")
+    private String jwtSecret;
 
-    // Generate token
-    public String generateToken(String email) {
+    @Value("${jwt.expiration-ms:3600000}")
+    private long expirationMs;
+
+    private SecretKey secretKey;
+
+    @PostConstruct
+    public void init() {
+        byte[] keyBytes = jwtSecret.getBytes();
+        if (keyBytes.length < 32) {
+            byte[] paddedKey = new byte[32];
+            System.arraycopy(keyBytes, 0, paddedKey, 0, keyBytes.length);
+            secretKey = Keys.hmacShaKeyFor(paddedKey);
+        } else {
+            secretKey = Keys.hmacShaKeyFor(keyBytes);
+        }
+        log.info("JWT utility initialized with expiration: {} ms", expirationMs);
+    }
+
+    public String generateToken(String username) {
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + expirationMs);
+
         return Jwts.builder()
-                .setSubject(email)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 10 hours
-                .signWith(secretKey)  // Signing with the updated way
+                .setSubject(username)
+                .setIssuedAt(now)
+                .setExpiration(expiryDate)
+                .signWith(secretKey, SignatureAlgorithm.HS512)
                 .compact();
     }
 
-    // Extract username (email) from token
     public String extractUsername(String token) {
-        return extractClaims(token).getSubject();
+        return getClaimsFromToken(token).getSubject();
     }
 
-    // Extract all claims
-    private Claims extractClaims(String token) {
-        return Jwts.parserBuilder()  // New method to create a parser
-                .setSigningKey(secretKey)  // Use the secret key to parse and validate the token
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parserBuilder()
+                    .setSigningKey(secretKey)
+                    .build()
+                    .parseClaimsJws(token);
+            return true;
+        } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
+            log.error("Invalid JWT signature: {}", e.getMessage());
+        } catch (ExpiredJwtException e) {
+            log.error("Expired JWT token: {}", e.getMessage());
+        } catch (UnsupportedJwtException e) {
+            log.error("Unsupported JWT token: {}", e.getMessage());
+        } catch (IllegalArgumentException e) {
+            log.error("JWT claims string is empty: {}", e.getMessage());
+        }
+        return false;
+    }
+
+    private Claims getClaimsFromToken(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(secretKey)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
-    }
-
-    // Validate the token
-    public boolean isTokenValid(String token, String username) {
-        return (username.equals(extractUsername(token)) && !isTokenExpired(token));
-    }
-
-    private boolean isTokenExpired(String token) {
-        return extractClaims(token).getExpiration().before(new Date());
     }
 }

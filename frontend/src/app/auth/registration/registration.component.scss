@@ -217,6 +217,34 @@ mat-form-field {
     }
 }
 
+/* Footer */
+.registration-footer {
+    margin-top: var(--spacing-lg);
+    text-align: center;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.7);
+    opacity: 0.8;
+}
+
+/* Demo Credentials */
+.demo-credentials {
+    margin-top: var(--spacing-xl);
+
+    mat-divider {
+        margin-bottom: var(--spacing-md);
+    }
+}
+
+.demo-hint {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-xs);
+    color: var(--text-secondary);
+    font-size: 0.813rem;
+    margin: 0;
+}
+
 /* Material overrides for better styling */
 ::ng-deep {
     .registration-card {

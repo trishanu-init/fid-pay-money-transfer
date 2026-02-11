@@ -1,65 +1,59 @@
 package com.fidelity.moneytransfer.config;
 
+import com.fidelity.moneytransfer.util.JwtUtil;
 import io.jsonwebtoken.JwtException;
-
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.fidelity.moneytransfer.util.JwtUtil;
-
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 
-
+@Component
+@RequiredArgsConstructor
+@Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
 
-    public JwtAuthenticationFilter(JwtUtil jwtUtil) {
-        this.jwtUtil = jwtUtil;
-    }
+    @Override
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain) throws ServletException, IOException {
+        try {
+            String token = extractTokenFromRequest(request);
 
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String token = extractToken(request);
-
-        if (token != null) {
-            try {
-                if (jwtUtil.isTokenValid(token, jwtUtil.extractUsername(token))) {
-                    // Create authentication object and set it in the security context
-                    UsernamePasswordAuthenticationToken authentication = 
-                        new UsernamePasswordAuthenticationToken(jwtUtil.extractUsername(token), null, new ArrayList<>());
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-                }
-            } catch (JwtException e) {
-                // Handle invalid or expired token
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().write("Invalid or expired token");
-                return;
+            if (StringUtils.hasText(token) && jwtUtil.validateToken(token)) {
+                String username = jwtUtil.extractUsername(token);
+                UsernamePasswordAuthenticationToken authentication = 
+                    new UsernamePasswordAuthenticationToken(username, null, 
+                        List.of(new SimpleGrantedAuthority("ROLE_USER")));
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+                log.info("JWT token validated for user: {}", username);
             }
+        } catch (JwtException e) {
+            log.error("JWT validation failed: {}", e.getMessage());
+        } catch (Exception e) {
+            log.error("Unexpected error in JWT filter: {}", e.getMessage());
         }
 
-        filterChain.doFilter(request, response);  // Proceed to the next filter in the chain
+        filterChain.doFilter(request, response);
     }
 
-    // Extract the token from the Authorization header
-    private String extractToken(HttpServletRequest request) {
-        String header = request.getHeader("Authorization");
-        if (header != null && header.startsWith("Bearer ")) {
-            return header.substring(7);  // Remove the "Bearer " prefix
+    private String extractTokenFromRequest(HttpServletRequest request) {
+        String bearerToken = request.getHeader("Authorization");
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);
         }
         return null;
     }
-
-	@Override
-	protected void doFilterInternal(jakarta.servlet.http.HttpServletRequest request,
-			jakarta.servlet.http.HttpServletResponse response, jakarta.servlet.FilterChain filterChain)
-			throws jakarta.servlet.ServletException, IOException {
-		// TODO Auto-generated method stub
-		
-	}
 }

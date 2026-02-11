@@ -2,8 +2,11 @@ package com.fidelity.moneytransfer.controller;
 
 import com.fidelity.moneytransfer.domain.TransactionLog;
 import com.fidelity.moneytransfer.dto.AccountResponse;
+import com.fidelity.moneytransfer.exception.UnauthorizedAccessException;
 import com.fidelity.moneytransfer.service.AccountService;
+import com.fidelity.moneytransfer.service.AccountOwnershipService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,22 +17,48 @@ import java.util.List;
 @RequestMapping("/api/v1/accounts")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:4200")
+@Slf4j
 public class AccountController {
 
     private final AccountService accountService;
+    private final AccountOwnershipService accountOwnershipService;
 
     @GetMapping("/{id}")
     public ResponseEntity<AccountResponse> getAccountDetails(@PathVariable Long id) {
-        return ResponseEntity.ok(accountService.getAccountDetails(id));
+        try {
+            // Verify the authenticated user owns this account
+            accountOwnershipService.verifyAccountOwnership(id);
+            log.info("User accessing account: {}", id);
+            return ResponseEntity.ok(accountService.getAccountDetails(id));
+        } catch (SecurityException e) {
+            log.warn("Unauthorized access attempt to account: {}", id);
+            throw new UnauthorizedAccessException(e.getMessage());
+        }
     }
 
     @GetMapping("/{id}/balance")
     public ResponseEntity<BigDecimal> getAccountBalance(@PathVariable Long id) {
-        return ResponseEntity.ok(accountService.getBalance(id));
+        try {
+            // Verify the authenticated user owns this account
+            accountOwnershipService.verifyAccountOwnership(id);
+            log.info("User checking balance for account: {}", id);
+            return ResponseEntity.ok(accountService.getBalance(id));
+        } catch (SecurityException e) {
+            log.warn("Unauthorized access attempt to account balance: {}", id);
+            throw new UnauthorizedAccessException(e.getMessage());
+        }
     }
 
     @GetMapping("/{id}/transactions")
     public ResponseEntity<List<TransactionLog>> getAccountTransactions(@PathVariable Long id) {
-        return ResponseEntity.ok(accountService.getTransactionHistory(id));
+        try {
+            // Verify the authenticated user owns this account
+            accountOwnershipService.verifyAccountOwnership(id);
+            log.info("User accessing transactions for account: {}", id);
+            return ResponseEntity.ok(accountService.getTransactionHistory(id));
+        } catch (SecurityException e) {
+            log.warn("Unauthorized access attempt to account transactions: {}", id);
+            throw new UnauthorizedAccessException(e.getMessage());
+        }
     }
 }
