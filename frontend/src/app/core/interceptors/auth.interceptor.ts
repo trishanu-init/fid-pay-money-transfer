@@ -13,8 +13,8 @@ import { Router } from '@angular/router';
 
 /**
  * Auth Interceptor
- * 
- * Automatically attaches the Basic Auth header to all outgoing
+ *
+ * Automatically attaches the JWT Bearer token to all outgoing
  * API requests and handles authentication errors.
  */
 @Injectable()
@@ -26,8 +26,8 @@ export class AuthInterceptor implements HttpInterceptor {
     ) { }
 
     intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
-        // Get the Basic Auth header
-        const authHeader = this.authService.getBasicAuthHeader();
+        // Get the JWT Bearer token
+        const authHeader = this.authService.getAuthHeader();
 
         // Clone the request and add the authorization header if available
         if (authHeader) {

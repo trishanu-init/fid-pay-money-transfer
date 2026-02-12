@@ -23,7 +23,7 @@ public class Account {
     @Column(nullable = false)
     private String holderName;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String email;
 
     @Column(nullable = false)
@@ -32,6 +32,9 @@ public class Account {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private AccountStatus status;
+    
+    @Column(nullable = false)
+    private String password;
 
     @Version
     private Integer version;

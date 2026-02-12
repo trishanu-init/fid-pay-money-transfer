@@ -10,85 +10,126 @@ import com.fidelity.moneytransfer.exception.DuplicateTransferException;
 import com.fidelity.moneytransfer.repository.AccountRepository;
 import com.fidelity.moneytransfer.repository.TransactionLogRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class TransferServiceImpl implements TransferService {
 
         private final AccountRepository accountRepository;
         private final TransactionLogRepository transactionLogRepository;
         private final EmailService emailService;
+        private final TransactionTemplate transactionTemplate;
 
         private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a");
 
         @Override
-        @Transactional
         public TransferResponse transferMoney(TransferRequest request) {
                 if (transactionLogRepository.existsByIdempotencyKey(request.idempotencyKey())) {
                         throw new DuplicateTransferException("Transaction with this Idempotency Key already processed");
                 }
 
-                Account fromAccount = accountRepository.findById(request.fromAccountId())
-                                .orElseThrow(() -> new AccountNotFoundException("Source account not found"));
+                try {
+                        TransactionLog successLog = transactionTemplate.execute(status -> {
+                                Account fromAccount = accountRepository.findById(request.fromAccountId())
+                                        .orElseThrow(() -> new AccountNotFoundException("Source account not found"));
 
-                Account toAccount = accountRepository.findById(request.toAccountId())
-                                .orElseThrow(() -> new AccountNotFoundException("Destination account not found"));
+                                Account toAccount = accountRepository.findById(request.toAccountId())
+                                        .orElseThrow(() -> new AccountNotFoundException("Destination account not found"));
 
-                fromAccount.debit(request.amount());
-                toAccount.credit(request.amount());
+                                fromAccount.debit(request.amount());
+                                toAccount.credit(request.amount());
 
-                accountRepository.save(fromAccount);
-                accountRepository.save(toAccount);
+                                accountRepository.save(fromAccount);
+                                accountRepository.save(toAccount);
 
-                TransactionLog log = new TransactionLog();
-                log.setFromAccountId(fromAccount.getId());
-                log.setToAccountId(toAccount.getId());
-                log.setAmount(request.amount());
-                log.setStatus(TransactionStatus.SUCCESS);
-                log.setIdempotencyKey(request.idempotencyKey());
-                log.setCreatedOn(LocalDateTime.now());
+                                TransactionLog log = new TransactionLog();
+                                log.setFromAccountId(fromAccount.getId());
+                                log.setToAccountId(toAccount.getId());
+                                log.setAmount(request.amount());
+                                log.setStatus(TransactionStatus.SUCCESS);
+                                log.setIdempotencyKey(request.idempotencyKey());
+                                log.setCreatedOn(LocalDateTime.now());
 
-                transactionLogRepository.save(log);
+                                return transactionLogRepository.save(log);
+                        });
 
-                String transactionDate = log.getCreatedOn().format(DATE_FORMATTER);
+                        Account sender = accountRepository.findById(request.fromAccountId()).orElseThrow();
+                        Account receiver = accountRepository.findById(request.toAccountId()).orElseThrow();
 
-                // Notify sender (money debited)
-                emailService.sendTransactionNotification(
-                                fromAccount.getEmail(),
-                                fromAccount.getHolderName(),
-                                "DEBIT",
-                                request.amount(),
-                                fromAccount.getId().toString(),
-                                fromAccount.getBalance(),
-                                transactionDate,
-                                toAccount.getHolderName(),
-                                toAccount.getId().toString(),
-                                log.getId().toString());
+                        String transactionDate = successLog.getCreatedOn().format(DATE_FORMATTER);
 
-                // Notify receiver (money credited)
-                emailService.sendTransactionNotification(
-                                toAccount.getEmail(),
-                                toAccount.getHolderName(),
-                                "CREDIT",
-                                request.amount(),
-                                toAccount.getId().toString(),
-                                toAccount.getBalance(),
-                                transactionDate,
-                                fromAccount.getHolderName(),
-                                fromAccount.getId().toString(),
-                                log.getId().toString());
+                        try {
+                                emailService.sendTransactionNotification(
+                                        sender.getEmail(),
+                                        sender.getHolderName(),
+                                        "DEBIT",
+                                        request.amount(),
+                                        sender.getId().toString(),
+                                        sender.getBalance(),
+                                        transactionDate,
+                                        receiver.getHolderName(),
+                                        receiver.getId().toString(),
+                                        successLog.getId().toString()
+                                );
+                        } catch (Exception e) {
+                                log.warn("Failed to send debit email", e);
+                        }
 
-                return new TransferResponse(
-                                log.getId(),
+                        try {
+                                emailService.sendTransactionNotification(
+                                        receiver.getEmail(),
+                                        receiver.getHolderName(),
+                                        "CREDIT",
+                                        request.amount(),
+                                        receiver.getId().toString(),
+                                        receiver.getBalance(),
+                                        transactionDate,
+                                        sender.getHolderName(),
+                                        sender.getId().toString(),
+                                        successLog.getId().toString()
+                                );
+                        } catch (Exception e) {
+                                log.warn("Failed to send credit email", e);
+                        }
+
+                        return new TransferResponse(
+                                successLog.getId(),
                                 "SUCCESS",
                                 "Transfer completed successfully",
-                                fromAccount.getId(),
-                                toAccount.getId(),
-                                request.amount());
+                                request.fromAccountId(),
+                                request.toAccountId(),
+                                request.amount()
+                        );
+
+                } catch (Exception e) {
+                        try {
+                                TransactionLog failLog = new TransactionLog();
+                                failLog.setFromAccountId(request.fromAccountId());
+                                failLog.setToAccountId(request.toAccountId());
+                                failLog.setAmount(request.amount());
+                                failLog.setStatus(TransactionStatus.FAILED);
+                                failLog.setIdempotencyKey(request.idempotencyKey());
+                                failLog.setCreatedOn(LocalDateTime.now());
+
+                                String errorMsg = e.getMessage() != null ? e.getMessage() : "Unknown Error";
+                                if (errorMsg.length() > 255) {
+                                        errorMsg = errorMsg.substring(0, 255);
+                                }
+                                failLog.setFailureReason(errorMsg);
+
+                                transactionLogRepository.save(failLog);
+                        } catch (Exception logEx) {
+                                log.error("Failed to save error log", logEx);
+                        }
+
+                        throw e;
+                }
         }
 }

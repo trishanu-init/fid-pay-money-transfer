@@ -6,16 +6,9 @@
   <component name="ChangeListManager">
     <list default="true" id="64935ab2-9944-4b39-a9d0-7fe28fb72148" name="Changes" comment="feat:added otp service">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/fidelity/moneytransfer/controller/OtpController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/fidelity/moneytransfer/controller/OtpController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/fidelity/moneytransfer/dto/OtpRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/fidelity/moneytransfer/dto/OtpRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/fidelity/moneytransfer/dto/OtpResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/fidelity/moneytransfer/dto/OtpResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/fidelity/moneytransfer/dto/OtpVerifyRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/fidelity/moneytransfer/dto/OtpVerifyRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/fidelity/moneytransfer/service/EmailService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/fidelity/moneytransfer/service/EmailService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/fidelity/moneytransfer/service/OtpService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/fidelity/moneytransfer/service/OtpService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/core/models/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/core/models/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/core/services/transfer.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/core/services/transfer.service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/transfer/transfer.module.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/transfer/transfer.module.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/app/transfer/transfer/transfer.component.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/transfer/transfer/transfer.component.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/angular.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/angular.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/environments/environment.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/environments/environment.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -54,6 +47,9 @@
   &quot;associatedIndex&quot;: 4
 }</component>
   <component name="ProjectId" id="39Lp9U89G36e5EYPXSNIRFr07lJ" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />

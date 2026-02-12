@@ -50,7 +50,7 @@ export interface TransferResponse {
  * Login credentials
  */
 export interface LoginCredentials {
-    username: string;
+    email: string;
     password: string;
 }
 
@@ -59,8 +59,11 @@ export interface LoginCredentials {
  */
 export interface AuthResponse {
     token: string;
-    userId: number;
+    tokenType: string;
+    email: string;
+    message: string;
     expiresIn: number;
+    accountId: number;
 }
 
 /**
