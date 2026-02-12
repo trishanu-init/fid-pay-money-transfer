@@ -10,6 +10,7 @@ import { AccountService } from '../../core/services/account.service';
 import { TransferService } from '../../core/services/transfer.service';
 import { Account } from '../../core/models';
 import { ConfirmTransferDialogComponent } from '../confirm-dialog/confirm-dialog.component';
+import { OtpDialogComponent, OtpDialogData, OtpDialogResult } from '../otp-dialog/otp-dialog.component';
 
 /**
  * Transfer Component
@@ -19,6 +20,7 @@ import { ConfirmTransferDialogComponent } from '../confirm-dialog/confirm-dialog
  * - Destination account input
  * - Amount input with validation
  * - Confirmation dialog
+ * - OTP verification
  * - Success/error feedback
  */
 @Component({
@@ -77,7 +79,7 @@ export class TransferComponent implements OnInit, OnDestroy {
     }
 
     /**
-     * Handle form submission - show confirmation dialog
+     * Handle form submission - show confirmation dialog, then OTP dialog
      */
     onSubmit(): void {
         if (this.transferForm.invalid || !this.account) {
@@ -107,13 +109,36 @@ export class TransferComponent implements OnInit, OnDestroy {
 
         dialogRef.afterClosed().subscribe(confirmed => {
             if (confirmed) {
-                this.executeTransfer();
+                this.showOtpDialog();
             }
         });
     }
 
     /**
-     * Execute the transfer after confirmation
+     * Show OTP verification dialog
+     */
+    private showOtpDialog(): void {
+        if (!this.account) return;
+
+        const dialogRef = this.dialog.open(OtpDialogComponent, {
+            width: '450px',
+            disableClose: true,
+            data: {
+                accountId: this.account.accountId
+            } as OtpDialogData
+        });
+
+        dialogRef.afterClosed().subscribe((result: OtpDialogResult) => {
+            if (result?.verified) {
+                this.executeTransfer();
+            } else {
+                this.showError('Transfer cancelled - OTP verification required');
+            }
+        });
+    }
+
+    /**
+     * Execute the transfer after OTP verification
      */
     private executeTransfer(): void {
         if (!this.account) return;

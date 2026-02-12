@@ -1,10 +1,7 @@
 package com.fidelity.moneytransfer.dto;
 
-import lombok.Data;
+import jakarta.validation.constraints.NotNull;
 
-@Data
-public class OtpRequest {
-    private String identifier;
-    private int length;
+public record OtpRequest(
+        @NotNull(message = "Account ID is required") Long accountId) {
 }
-

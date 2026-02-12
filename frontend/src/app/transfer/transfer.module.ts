@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { SharedModule } from '../shared/shared.module';
 import { TransferComponent } from './transfer/transfer.component';
 import { ConfirmTransferDialogComponent } from './confirm-dialog/confirm-dialog.component';
+import { OtpDialogComponent } from './otp-dialog/otp-dialog.component';
 import { AuthGuard } from '../core/guards/auth.guard';
 
 const routes: Routes = [
@@ -16,12 +17,13 @@ const routes: Routes = [
 /**
  * Transfer Module
  * 
- * Money transfer functionality with confirmation dialog.
+ * Money transfer functionality with confirmation dialog and OTP verification.
  */
 @NgModule({
     declarations: [
         TransferComponent,
-        ConfirmTransferDialogComponent
+        ConfirmTransferDialogComponent,
+        OtpDialogComponent
     ],
     imports: [
         SharedModule,
@@ -29,3 +31,4 @@ const routes: Routes = [
     ]
 })
 export class TransferModule { }
+

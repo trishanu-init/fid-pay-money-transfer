@@ -1,9 +1,11 @@
 package com.fidelity.moneytransfer.dto;
 
-import lombok.Data;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
-@Data
-public class OtpVerifyRequest {
-    private String identifier;
-    private String otp;
+public record OtpVerifyRequest(
+        @NotNull(message = "Account ID is required") Long accountId,
+
+        @NotBlank(message = "OTP is required") @Size(min = 6, max = 6, message = "OTP must be 6 digits") String otp) {
 }

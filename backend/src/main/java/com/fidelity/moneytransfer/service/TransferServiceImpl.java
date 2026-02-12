@@ -1,4 +1,4 @@
-package com.fidelity.moneytransfer.service; // Adjust package if needed
+package com.fidelity.moneytransfer.service;
 
 import com.fidelity.moneytransfer.domain.Account;
 import com.fidelity.moneytransfer.domain.TransactionLog;

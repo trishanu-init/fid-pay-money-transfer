@@ -1,0 +1,73 @@
+<h2 mat-dialog-title class="dialog-title">
+    <mat-icon>security</mat-icon>
+    <span>Verify OTP</span>
+</h2>
+
+<mat-dialog-content class="dialog-content">
+    <!-- Info Message -->
+    <div class="otp-info">
+        <mat-icon>email</mat-icon>
+        <p>We've sent a 6-digit OTP to your registered email. Please enter it below to verify your transfer.</p>
+    </div>
+
+    <!-- Expiry Timer -->
+    <div class="expiry-timer" *ngIf="expiryCountdown > 0 && !errorMessage.includes('expired')">
+        <mat-icon>timer</mat-icon>
+        <span>OTP expires in: <strong>{{ formatTime(expiryCountdown) }}</strong></span>
+    </div>
+
+    <!-- Success Message -->
+    <div class="success-message" *ngIf="successMessage">
+        <mat-icon>check_circle</mat-icon>
+        <span>{{ successMessage }}</span>
+    </div>
+
+    <!-- Error Message -->
+    <div class="error-message" *ngIf="errorMessage">
+        <mat-icon>error</mat-icon>
+        <span>{{ errorMessage }}</span>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div class="loading-spinner" *ngIf="isSending">
+        <mat-spinner diameter="30"></mat-spinner>
+        <span>Sending OTP...</span>
+    </div>
+
+    <!-- OTP Form -->
+    <form [formGroup]="otpForm" (ngSubmit)="verifyOtp()" *ngIf="!isSending">
+        <mat-form-field appearance="outline" class="otp-input">
+            <mat-label>Enter 6-digit OTP</mat-label>
+            <input matInput formControlName="otp" placeholder="000000" maxlength="6" inputmode="numeric"
+                autocomplete="one-time-code" id="otp-input">
+            <mat-icon matPrefix>lock</mat-icon>
+            <mat-error *ngIf="otpForm.get('otp')?.hasError('required')">
+                OTP is required
+            </mat-error>
+            <mat-error *ngIf="otpForm.get('otp')?.hasError('pattern')">
+                Please enter a valid 6-digit OTP
+            </mat-error>
+        </mat-form-field>
+
+        <!-- Resend Link -->
+        <div class="resend-section">
+            <span *ngIf="resendCooldown > 0">Resend OTP in {{ resendCooldown }}s</span>
+            <button mat-button type="button" color="primary" *ngIf="canResend" (click)="sendOtp()" id="resend-otp-btn">
+                <mat-icon>refresh</mat-icon>
+                Resend OTP
+            </button>
+        </div>
+    </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="dialog-actions">
+    <button mat-button type="button" (click)="cancel()" [disabled]="isLoading" id="cancel-otp-btn">
+        Cancel
+    </button>
+    <button mat-raised-button color="primary" (click)="verifyOtp()"
+        [disabled]="isLoading || otpForm.invalid || isSending" id="verify-otp-btn">
+        <mat-spinner *ngIf="isLoading" diameter="20"></mat-spinner>
+        <mat-icon *ngIf="!isLoading">verified_user</mat-icon>
+        <span>{{ isLoading ? 'Verifying...' : 'Verify OTP' }}</span>
+    </button>
+</mat-dialog-actions>

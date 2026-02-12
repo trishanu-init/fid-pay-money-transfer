@@ -27,9 +27,6 @@ export interface TransactionLog {
 
 export type TransactionStatus = 'SUCCESS' | 'FAILED';
 
-/**
- * Transfer request payload
- */
 export interface TransferRequest {
     fromAccountId: number;
     toAccountId: number;
@@ -74,3 +71,27 @@ export interface ApiError {
     message: string;
     timestamp: string;
 }
+
+/**
+ * OTP Request for sending OTP
+ */
+export interface OtpRequest {
+    accountId: number;
+}
+
+/**
+ * OTP Verify Request
+ */
+export interface OtpVerifyRequest {
+    accountId: number;
+    otp: string;
+}
+
+/**
+ * OTP Response
+ */
+export interface OtpResponse {
+    success: boolean;
+    message: string;
+}
+

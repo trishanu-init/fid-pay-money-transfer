@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
-import { TransferRequest, TransferResponse } from '../models';
+import { TransferRequest, TransferResponse, OtpRequest, OtpVerifyRequest, OtpResponse } from '../models';
 
 /**
  * Transfer Service
@@ -15,8 +15,48 @@ import { TransferRequest, TransferResponse } from '../models';
 })
 export class TransferService {
     private readonly baseUrl = `${environment.apiUrl}/transfers`;
+    private readonly otpUrl = `${environment.apiUrl}/otp`;
 
     constructor(private http: HttpClient) { }
+
+    /**
+     * Send OTP to sender's email
+     * 
+     * @param accountId - Sender's account ID
+     * @returns Observable with OTP response
+     */
+    sendOtp(accountId: number): Observable<OtpResponse> {
+        const request: OtpRequest = { accountId };
+        return this.http.post<OtpResponse>(`${this.otpUrl}/send-transfer`, request).pipe(
+            tap(response => {
+                console.log('OTP sent:', response);
+            }),
+            catchError(error => {
+                console.error('Failed to send OTP:', error);
+                throw error;
+            })
+        );
+    }
+
+    /**
+     * Verify OTP for transfer
+     * 
+     * @param accountId - Sender's account ID
+     * @param otp - OTP code entered by user
+     * @returns Observable with verification response
+     */
+    verifyOtp(accountId: number, otp: string): Observable<OtpResponse> {
+        const request: OtpVerifyRequest = { accountId, otp };
+        return this.http.post<OtpResponse>(`${this.otpUrl}/verify-transfer`, request).pipe(
+            tap(response => {
+                console.log('OTP verification:', response);
+            }),
+            catchError(error => {
+                console.error('OTP verification failed:', error);
+                throw error;
+            })
+        );
+    }
 
     /**
      * Execute a money transfer
