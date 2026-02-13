@@ -25,8 +25,8 @@ public class JwtUtil {
     @PostConstruct
     public void init() {
         byte[] keyBytes = jwtSecret.getBytes();
-        if (keyBytes.length < 32) {
-            byte[] paddedKey = new byte[32];
+        if (keyBytes.length < 64) {
+            byte[] paddedKey = new byte[64];
             System.arraycopy(keyBytes, 0, paddedKey, 0, keyBytes.length);
             secretKey = Keys.hmacShaKeyFor(paddedKey);
         } else {
