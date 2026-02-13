@@ -10,16 +10,13 @@ import com.fidelity.moneytransfer.exception.DuplicateTransferException;
 import com.fidelity.moneytransfer.repository.AccountRepository;
 import com.fidelity.moneytransfer.repository.TransactionLogRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class TransferServiceImpl implements TransferService {
 
         private final AccountRepository accountRepository;
@@ -27,10 +24,9 @@ public class TransferServiceImpl implements TransferService {
         private final EmailService emailService;
         private final TransactionTemplate transactionTemplate;
 
-        private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a");
-
         @Override
         public TransferResponse transferMoney(TransferRequest request) {
+
                 if (transactionLogRepository.existsByIdempotencyKey(request.idempotencyKey())) {
                         throw new DuplicateTransferException("Transaction with this Idempotency Key already processed");
                 }
@@ -61,42 +57,23 @@ public class TransferServiceImpl implements TransferService {
                         });
 
                         Account sender = accountRepository.findById(request.fromAccountId()).orElseThrow();
-                        Account receiver = accountRepository.findById(request.toAccountId()).orElseThrow();
-
-                        String transactionDate = successLog.getCreatedOn().format(DATE_FORMATTER);
-
-                        try {
+                        if (sender.getEmail() != null && !sender.getEmail().isEmpty()) {
                                 emailService.sendTransactionNotification(
                                         sender.getEmail(),
-                                        sender.getHolderName(),
-                                        "DEBIT",
+                                        successLog.getId().toString(),
                                         request.amount(),
-                                        sender.getId().toString(),
-                                        sender.getBalance(),
-                                        transactionDate,
-                                        receiver.getHolderName(),
-                                        receiver.getId().toString(),
-                                        successLog.getId().toString()
+                                        "DEBIT"
                                 );
-                        } catch (Exception e) {
-                                log.warn("Failed to send debit email", e);
                         }
 
-                        try {
+                        Account receiver = accountRepository.findById(request.toAccountId()).orElseThrow();
+                        if (receiver.getEmail() != null && !receiver.getEmail().isEmpty()) {
                                 emailService.sendTransactionNotification(
                                         receiver.getEmail(),
-                                        receiver.getHolderName(),
-                                        "CREDIT",
+                                        successLog.getId().toString(),
                                         request.amount(),
-                                        receiver.getId().toString(),
-                                        receiver.getBalance(),
-                                        transactionDate,
-                                        sender.getHolderName(),
-                                        sender.getId().toString(),
-                                        successLog.getId().toString()
+                                        "CREDIT"
                                 );
-                        } catch (Exception e) {
-                                log.warn("Failed to send credit email", e);
                         }
 
                         return new TransferResponse(
@@ -109,25 +86,22 @@ public class TransferServiceImpl implements TransferService {
                         );
 
                 } catch (Exception e) {
-                        try {
-                                TransactionLog failLog = new TransactionLog();
-                                failLog.setFromAccountId(request.fromAccountId());
-                                failLog.setToAccountId(request.toAccountId());
-                                failLog.setAmount(request.amount());
-                                failLog.setStatus(TransactionStatus.FAILED);
-                                failLog.setIdempotencyKey(request.idempotencyKey());
-                                failLog.setCreatedOn(LocalDateTime.now());
+                        TransactionLog failLog = new TransactionLog();
+                        failLog.setFromAccountId(request.fromAccountId());
+                        failLog.setToAccountId(request.toAccountId());
+                        failLog.setAmount(request.amount());
+                        failLog.setStatus(TransactionStatus.FAILED);
 
-                                String errorMsg = e.getMessage() != null ? e.getMessage() : "Unknown Error";
-                                if (errorMsg.length() > 255) {
-                                        errorMsg = errorMsg.substring(0, 255);
-                                }
-                                failLog.setFailureReason(errorMsg);
-
-                                transactionLogRepository.save(failLog);
-                        } catch (Exception logEx) {
-                                log.error("Failed to save error log", logEx);
+                        String failureReason = e.getMessage() != null ? e.getMessage() : "Unknown Error";
+                        if (failureReason.length() > 255) {
+                                failureReason = failureReason.substring(0, 255);
                         }
+                        failLog.setFailureReason(failureReason);
+
+                        failLog.setIdempotencyKey(request.idempotencyKey());
+                        failLog.setCreatedOn(LocalDateTime.now());
+
+                        transactionLogRepository.save(failLog);
 
                         throw e;
                 }
