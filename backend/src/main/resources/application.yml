@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 9890
 
 spring:
   application:
@@ -8,8 +8,8 @@ spring:
   datasource:
     # Update this URL if your database name or port is different
     url: jdbc:mysql://localhost:3306/money_transfer_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
-    username: YOUR_DB_USERNAME  # e.g., root
-    password: YOUR_DB_PASSWORD  # e.g., root123
+    username: root
+    password: Root123$
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
@@ -36,11 +36,17 @@ spring:
   # Default Security Credentials for Local Testing
   security:
     user:
-      name: 
-      password: 
+      name: admin
+      password: admin
       roles: USER
 
+# Custom Application Properties
 # Custom Application Properties
 app:
   notification:
     test-recipient: "recipient@example.com" # The email that receives test notifications
+
+# JWT Configuration
+jwt:
+  secret: "your-256-bit-secret-key-change-this-in-production-at-least-256-bits-long"
+  expiration-ms: 3600000

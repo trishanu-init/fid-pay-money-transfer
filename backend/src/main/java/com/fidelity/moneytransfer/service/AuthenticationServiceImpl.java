@@ -2,6 +2,7 @@ package com.fidelity.moneytransfer.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Random;
 
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
@@ -39,11 +40,18 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         String hashedPassword = BCrypt.hashpw(accountDto.password(), BCrypt.gensalt());
         account.setPassword(hashedPassword);
 
+        // Generate unique 10-digit ID
+        long uniqueId;
+        do {
+            uniqueId = generateUnique10DigitId();
+        } while (accountRepository.existsById(uniqueId));
+
+        account.setId(uniqueId);
         account.setBalance(new BigDecimal(0));
         account.setLastUpdated(LocalDateTime.now());
         account.setStatus(AccountStatus.ACTIVE);
 
-        log.info("User registered successfully: {}", accountDto.email());
+        log.info("User registered successfully with ID: {} for email: {}", uniqueId, accountDto.email());
         return accountRepository.save(account);
     }
 
@@ -83,4 +91,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         log.info("User logged in successfully with account ID: {}", account.getId());
         return account;
     }
+
+    private long generateUnique10DigitId() {
+        Random random = new Random();
+        // Generate a random 10-digit number (1000000000 to 9999999999)
+        return 1000000000L + (long) (random.nextDouble() * 9000000000L);
+    }
 }
+

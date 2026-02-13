@@ -7,6 +7,8 @@ import com.fidelity.moneytransfer.service.AccountService;
 import com.fidelity.moneytransfer.service.AccountOwnershipService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,12 +52,14 @@ public class AccountController {
     }
 
     @GetMapping("/{id}/transactions")
-    public ResponseEntity<List<TransactionLog>> getAccountTransactions(@PathVariable Long id) {
+    public ResponseEntity<Page<TransactionLog>> getAccountTransactions(@PathVariable Long id,
+    		@RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
         try {
             // Verify the authenticated user owns this account
             accountOwnershipService.verifyAccountOwnership(id);
             log.info("User accessing transactions for account: {}", id);
-            return ResponseEntity.ok(accountService.getTransactionHistory(id));
+            return ResponseEntity.ok(accountService.getTransactionHistory(id, page, size));
         } catch (SecurityException e) {
             log.warn("Unauthorized access attempt to account transactions: {}", id);
             throw new UnauthorizedAccessException(e.getMessage());
