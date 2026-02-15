@@ -49,11 +49,8 @@ export class AuthService {
     /**
      * Register a new user by sending data to the backend
      */
-    register(userData: { username: string, email: string, password: string }): Observable<AuthResponse> {
-        return this.http.post<AuthResponse>(`${this.apiUrl}/register`, userData).pipe(
-            tap((response: AuthResponse) => {
-                this.handleAuthSuccess({ email: userData.email, password: userData.password }, response);
-            }),
+    register(userData: { username: string, email: string, password: string }): Observable<any> {
+        return this.http.post<any>(`${this.apiUrl}/register`, userData).pipe(
             catchError((error) => {
                 return this.handleError(error);
             })
