@@ -7,6 +7,8 @@ import com.fidelity.moneytransfer.exception.AccountNotFoundException;
 import com.fidelity.moneytransfer.repository.AccountRepository;
 import com.fidelity.moneytransfer.repository.TransactionLogRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -44,5 +46,11 @@ public class AccountServiceImpl implements AccountService {
     public List<TransactionLog> getTransactionHistory(Long accountId) {
         // Fetches transactions where the user is EITHER the sender OR the receiver
         return transactionLogRepository.findByFromAccountIdOrToAccountIdOrderByCreatedOnDesc(accountId, accountId);
+    }
+
+    @Override
+    public Page<TransactionLog> getTransactionHistory(Long accountId, Pageable pageable) {
+        return transactionLogRepository.findByFromAccountIdOrToAccountIdOrderByCreatedOnDesc(accountId, accountId,
+                pageable);
     }
 }

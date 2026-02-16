@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, ViewChild, AfterViewInit } from '@angular/core';
-import { MatPaginator } from '@angular/material/paginator';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { Subject } from 'rxjs';
@@ -14,6 +14,7 @@ export type TransactionFilter = 'all' | 'sent' | 'received';
  * History Component
  * 
  * Displays transaction history with:
+ * - Server-side pagination via Spring Pageable
  * - Filter tabs for All/Sent/Received transactions
  * - Material table with sorting and pagination
  * - DEBIT/CREDIT type styling
@@ -28,11 +29,17 @@ export type TransactionFilter = 'all' | 'sent' | 'received';
 export class HistoryComponent implements OnInit, OnDestroy, AfterViewInit {
     displayedColumns = ['createdOn', 'type', 'amount', 'status'];
     dataSource = new MatTableDataSource<TransactionLog>([]);
-    allTransactions: TransactionLog[] = [];
+    allPageTransactions: TransactionLog[] = []; // All transactions for current page (before client filter)
     currentAccountId: number | null = null;
     isLoading = true;
     errorMessage = '';
     isMobile = false;
+
+    // Server-side pagination state
+    totalElements = 0;
+    pageSize = 10;
+    pageIndex = 0;
+    pageSizeOptions = [5, 10, 25];
 
     // Filter tab state
     activeFilter: TransactionFilter = 'all';
@@ -58,7 +65,7 @@ export class HistoryComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     ngAfterViewInit(): void {
-        this.dataSource.paginator = this.paginator;
+        // Sort is still client-side within the current page
         this.dataSource.sort = this.sort;
     }
 
@@ -75,21 +82,18 @@ export class HistoryComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     /**
-     * Load transaction history
+     * Load transaction history from server with pagination
      */
     loadTransactions(): void {
         this.isLoading = true;
         this.errorMessage = '';
 
-        this.accountService.getTransactions()
+        this.accountService.getTransactionsPaginated(this.pageIndex, this.pageSize)
             .pipe(takeUntil(this.destroy$))
             .subscribe({
-                next: (transactions) => {
-                    // Sort by date descending (newest first)
-                    transactions.sort((a, b) =>
-                        new Date(b.createdOn).getTime() - new Date(a.createdOn).getTime()
-                    );
-                    this.allTransactions = transactions;
+                next: (page) => {
+                    this.allPageTransactions = page.content;
+                    this.totalElements = page.totalElements;
                     this.updateTransactionCounts();
                     this.applyFilter(this.activeFilter);
                     this.isLoading = false;
@@ -103,18 +107,27 @@ export class HistoryComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     /**
-     * Update transaction counts for each filter tab
+     * Handle paginator page change event
+     */
+    onPageChange(event: PageEvent): void {
+        this.pageIndex = event.pageIndex;
+        this.pageSize = event.pageSize;
+        this.loadTransactions();
+    }
+
+    /**
+     * Update transaction counts for each filter tab (within current page)
      */
     updateTransactionCounts(): void {
         this.transactionCounts = {
-            all: this.allTransactions.length,
-            sent: this.allTransactions.filter(tx => this.getTransactionType(tx) === 'DEBIT').length,
-            received: this.allTransactions.filter(tx => this.getTransactionType(tx) === 'CREDIT').length
+            all: this.allPageTransactions.length,
+            sent: this.allPageTransactions.filter(tx => this.getTransactionType(tx) === 'DEBIT').length,
+            received: this.allPageTransactions.filter(tx => this.getTransactionType(tx) === 'CREDIT').length
         };
     }
 
     /**
-     * Apply filter to transactions
+     * Apply filter to transactions (client-side within current page)
      */
     applyFilter(filter: TransactionFilter): void {
         this.activeFilter = filter;
@@ -122,21 +135,16 @@ export class HistoryComponent implements OnInit, OnDestroy, AfterViewInit {
         let filtered: TransactionLog[];
         switch (filter) {
             case 'sent':
-                filtered = this.allTransactions.filter(tx => this.getTransactionType(tx) === 'DEBIT');
+                filtered = this.allPageTransactions.filter(tx => this.getTransactionType(tx) === 'DEBIT');
                 break;
             case 'received':
-                filtered = this.allTransactions.filter(tx => this.getTransactionType(tx) === 'CREDIT');
+                filtered = this.allPageTransactions.filter(tx => this.getTransactionType(tx) === 'CREDIT');
                 break;
             default:
-                filtered = this.allTransactions;
+                filtered = this.allPageTransactions;
         }
 
         this.dataSource.data = filtered;
-
-        // Reset paginator to first page when filter changes
-        if (this.paginator) {
-            this.paginator.firstPage();
-        }
     }
 
     /**
@@ -155,7 +163,7 @@ export class HistoryComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     /**
-     * Refresh transactions
+     * Refresh transactions (reload current page)
      */
     refresh(): void {
         this.loadTransactions();

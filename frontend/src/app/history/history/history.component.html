@@ -84,7 +84,7 @@
 
             <mat-card-content>
                 <!-- Empty State -->
-                <div class="empty-state" *ngIf="dataSource.data.length === 0">
+                <div class="empty-state" *ngIf="dataSource.data.length === 0 && totalElements === 0">
                     <mat-icon>receipt_long</mat-icon>
                     <h3>No transactions yet</h3>
                     <p>Your transaction history will appear here</p>
@@ -145,7 +145,9 @@
                     </table>
                 </div>
 
-                <mat-paginator *ngIf="dataSource.data.length > 0" [pageSizeOptions]="[5, 10, 25]" showFirstLastButtons>
+                <!-- Server-side Paginator -->
+                <mat-paginator [length]="totalElements" [pageSize]="pageSize" [pageIndex]="pageIndex"
+                    [pageSizeOptions]="pageSizeOptions" (page)="onPageChange($event)" showFirstLastButtons>
                 </mat-paginator>
             </mat-card-content>
         </mat-card>
@@ -177,7 +179,7 @@
             </mat-tab-group>
 
             <!-- Empty State -->
-            <mat-card class="empty-card" *ngIf="dataSource.data.length === 0">
+            <mat-card class="empty-card" *ngIf="dataSource.data.length === 0 && totalElements === 0">
                 <mat-card-content class="empty-state">
                     <mat-icon>receipt_long</mat-icon>
                     <h3>No transactions yet</h3>
@@ -213,6 +215,11 @@
                     </div>
                 </mat-card-content>
             </mat-card>
+
+            <!-- Mobile Paginator -->
+            <mat-paginator [length]="totalElements" [pageSize]="pageSize" [pageIndex]="pageIndex"
+                [pageSizeOptions]="pageSizeOptions" (page)="onPageChange($event)" showFirstLastButtons>
+            </mat-paginator>
         </div>
     </main>
 </div>

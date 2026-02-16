@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
-import { Account, TransactionLog } from '../models';
+import { Account, TransactionLog, Page } from '../models';
 import { AuthService } from './auth.service';
 
 /**
@@ -94,6 +94,34 @@ export class AccountService {
     }
 
     /**
+     * Get paginated transaction history for the current user
+     */
+    getTransactionsPaginated(page: number = 0, size: number = 10): Observable<Page<TransactionLog>> {
+        const userId = this.authService.getCurrentUserId();
+        if (!userId) {
+            throw new Error('User not authenticated');
+        }
+        return this.getTransactionsByIdPaginated(userId, page, size);
+    }
+
+    /**
+     * Get paginated transaction history by account ID
+     */
+    getTransactionsByIdPaginated(accountId: number, page: number, size: number): Observable<Page<TransactionLog>> {
+        const params = new HttpParams()
+            .set('page', page.toString())
+            .set('size', size.toString())
+            .set('sort', 'createdOn,desc');
+
+        return this.http.get<Page<TransactionLog>>(`${this.baseUrl}/${accountId}/transactions`, { params }).pipe(
+            catchError(error => {
+                console.error('Error fetching paginated transactions:', error);
+                throw error;
+            })
+        );
+    }
+
+    /**
      * Enrich transactions with computed type (DEBIT/CREDIT) based on current account
      */
     private enrichTransactions(transactions: TransactionLog[], currentAccountId: number): TransactionLog[] {
@@ -110,3 +138,4 @@ export class AccountService {
         return transaction.fromAccountId === accountId ? 'DEBIT' : 'CREDIT';
     }
 }
+

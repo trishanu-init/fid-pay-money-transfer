@@ -7,11 +7,13 @@ import com.fidelity.moneytransfer.service.AccountService;
 import com.fidelity.moneytransfer.service.AccountOwnershipService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/accounts")
@@ -50,12 +52,15 @@ public class AccountController {
     }
 
     @GetMapping("/{id}/transactions")
-    public ResponseEntity<List<TransactionLog>> getAccountTransactions(@PathVariable Long id) {
+    public ResponseEntity<Page<TransactionLog>> getAccountTransactions(
+            @PathVariable Long id,
+            @PageableDefault(size = 10, sort = "createdOn") Pageable pageable) {
         try {
             // Verify the authenticated user owns this account
             accountOwnershipService.verifyAccountOwnership(id);
-            log.info("User accessing transactions for account: {}", id);
-            return ResponseEntity.ok(accountService.getTransactionHistory(id));
+            log.info("User accessing transactions for account: {}, page: {}, size: {}", id, pageable.getPageNumber(),
+                    pageable.getPageSize());
+            return ResponseEntity.ok(accountService.getTransactionHistory(id, pageable));
         } catch (SecurityException e) {
             log.warn("Unauthorized access attempt to account transactions: {}", id);
             throw new UnauthorizedAccessException(e.getMessage());
