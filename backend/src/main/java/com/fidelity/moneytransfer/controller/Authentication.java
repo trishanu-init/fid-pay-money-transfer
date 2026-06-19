@@ -14,6 +14,11 @@ import com.fidelity.moneytransfer.domain.Account;
 import com.fidelity.moneytransfer.dto.AccountCreateRequest;
 import com.fidelity.moneytransfer.dto.LoginRequest;
 import com.fidelity.moneytransfer.dto.LoginResponse;
+import com.fidelity.moneytransfer.dto.ForgotPasswordSendOtpRequest;
+import com.fidelity.moneytransfer.dto.ForgotPasswordVerifyOtpRequest;
+import com.fidelity.moneytransfer.dto.ForgotPasswordVerifyOtpResponse;
+import com.fidelity.moneytransfer.dto.ForgotPasswordResetRequest;
+import com.fidelity.moneytransfer.dto.OtpResponse;
 import com.fidelity.moneytransfer.service.AuthenticationService;
 
 import lombok.RequiredArgsConstructor;
@@ -56,5 +61,26 @@ public class Authentication {
             log.error("Login failed: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
+    }
+
+    @PostMapping("/forgot-password/send-otp")
+    public ResponseEntity<OtpResponse> sendForgotPasswordOtp(@Valid @RequestBody ForgotPasswordSendOtpRequest request) {
+        log.info("Requesting forgot-password OTP for email: {}", request.getEmail());
+        authService.sendForgotPasswordOtp(request.getEmail());
+        return ResponseEntity.ok(new OtpResponse(true, "OTP sent to your registered email"));
+    }
+
+    @PostMapping("/forgot-password/verify-otp")
+    public ResponseEntity<ForgotPasswordVerifyOtpResponse> verifyForgotPasswordOtp(@Valid @RequestBody ForgotPasswordVerifyOtpRequest request) {
+        log.info("Verifying forgot-password OTP for email: {}", request.getEmail());
+        String resetToken = authService.verifyForgotPasswordOtp(request.getEmail(), request.getOtp());
+        return ResponseEntity.ok(new ForgotPasswordVerifyOtpResponse(true, "OTP verified successfully", resetToken));
+    }
+
+    @PostMapping("/forgot-password/reset-password")
+    public ResponseEntity<OtpResponse> resetPassword(@Valid @RequestBody ForgotPasswordResetRequest request) {
+        log.info("Resetting password for email: {}", request.getEmail());
+        authService.resetPassword(request.getEmail(), request.getResetToken(), request.getNewPassword());
+        return ResponseEntity.ok(new OtpResponse(true, "Password updated successfully"));
     }
 }

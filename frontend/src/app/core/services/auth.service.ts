@@ -129,6 +129,33 @@ export class AuthService {
     }
 
     /**
+     * Request OTP for forgot password flow
+     */
+    sendForgotPasswordOtp(email: string): Observable<any> {
+        return this.http.post<any>(`${this.apiUrl}/forgot-password/send-otp`, { email }).pipe(
+            catchError((error) => this.handleError(error))
+        );
+    }
+
+    /**
+     * Verify OTP for forgot password flow
+     */
+    verifyForgotPasswordOtp(email: string, otp: string): Observable<any> {
+        return this.http.post<any>(`${this.apiUrl}/forgot-password/verify-otp`, { email, otp }).pipe(
+            catchError((error) => this.handleError(error))
+        );
+    }
+
+    /**
+     * Reset password for forgot password flow
+     */
+    resetPassword(passwordData: { email: string; resetToken: string; newPassword: string }): Observable<any> {
+        return this.http.post<any>(`${this.apiUrl}/forgot-password/reset-password`, passwordData).pipe(
+            catchError((error) => this.handleError(error))
+        );
+    }
+
+    /**
      * Error handler for HTTP requests
      */
     private handleError(error: any): Observable<never> {

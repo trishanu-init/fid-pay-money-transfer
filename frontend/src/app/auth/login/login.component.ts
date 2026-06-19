@@ -2,6 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
+import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { ForgotPasswordDialogComponent } from '../forgot-password-dialog/forgot-password-dialog.component';
 
 /**
  * Login Component
@@ -25,7 +28,9 @@ export class LoginComponent implements OnInit {
         private fb: FormBuilder,
         private authService: AuthService,
         private router: Router,
-        private route: ActivatedRoute
+        private route: ActivatedRoute,
+        private dialog: MatDialog,
+        private snackBar: MatSnackBar
     ) {
         this.loginForm = this.fb.group({
             email: ['', [Validators.required, Validators.email]],
@@ -103,5 +108,31 @@ export class LoginComponent implements OnInit {
             return 'Password must be at least 6 characters';
         }
         return '';
+    }
+
+    /**
+     * Open forgot password dialog
+     */
+    openForgotPasswordDialog(): void {
+        const dialogRef = this.dialog.open(ForgotPasswordDialogComponent, {
+            width: '450px',
+            data: { email: this.loginForm.get('email')?.value },
+            disableClose: true
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (result && result.success) {
+                // Show success snackbar
+                this.snackBar.open(result.message || 'Password reset successfully', 'Close', {
+                    duration: 5000,
+                    panelClass: ['success-snackbar'],
+                    horizontalPosition: 'center',
+                    verticalPosition: 'bottom'
+                });
+                
+                // Redirect user back to login page
+                this.router.navigate(['/login']);
+            }
+        });
     }
 }

@@ -10,7 +10,7 @@ public class OtpStorageService
     private final Map<String, String> otpMap= new ConcurrentHashMap<>();
     private final Map<String, Long> expiryMap= new ConcurrentHashMap<>();
 
-    private static final long EXPIRY_MS = 5*60*1000; // 5 min
+    private static final long EXPIRY_MS = 2 * 60 * 1000; // 2 min
 
     public void saveOtp(String identifier, String otp){
         otpMap.put(identifier, otp);
