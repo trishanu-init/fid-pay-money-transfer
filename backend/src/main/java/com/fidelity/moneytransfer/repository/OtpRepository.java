@@ -15,7 +15,7 @@ public interface OtpRepository extends JpaRepository<Otp, Long> {
      * Find the latest unverified OTP for an account
      */
     @Query("SELECT o FROM Otp o WHERE o.accountId = :accountId AND o.verified = false ORDER BY o.createdAt DESC LIMIT 1")
-    Optional<Otp> findLatestUnverifiedByAccountId(@Param("accountId") Long accountId);
+    Optional<Otp> findLatestUnverifiedByAccountId(@Param("accountId") String accountId);
 
     /**
      * Delete all expired OTPs for cleanup

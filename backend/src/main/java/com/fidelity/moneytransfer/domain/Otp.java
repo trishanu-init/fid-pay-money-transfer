@@ -19,7 +19,7 @@ public class Otp {
     private Long id;
 
     @Column(nullable = false)
-    private Long accountId;
+    private String accountId;
 
     @Column(nullable = false, length = 6)
     private String otp;

@@ -37,7 +37,7 @@ export class AccountService {
     /**
      * Get account details by account ID
      */
-    getAccountById(accountId: number): Observable<Account> {
+    getAccountById(accountId: string): Observable<Account> {
         return this.http.get<Account>(`${this.baseUrl}/${accountId}`).pipe(
             catchError(error => {
                 console.error('Error fetching account:', error);
@@ -60,7 +60,7 @@ export class AccountService {
     /**
      * Get account balance by account ID
      */
-    getBalanceById(accountId: number): Observable<number> {
+    getBalanceById(accountId: string): Observable<number> {
         return this.http.get<number>(`${this.baseUrl}/${accountId}/balance`).pipe(
             catchError(error => {
                 console.error('Error fetching balance:', error);
@@ -83,7 +83,7 @@ export class AccountService {
     /**
      * Get transaction history by account ID
      */
-    getTransactionsById(accountId: number): Observable<TransactionLog[]> {
+    getTransactionsById(accountId: string): Observable<TransactionLog[]> {
         return this.http.get<TransactionLog[]>(`${this.baseUrl}/${accountId}/transactions`).pipe(
             map(transactions => this.enrichTransactions(transactions, accountId)),
             catchError(error => {
@@ -107,7 +107,7 @@ export class AccountService {
     /**
      * Get paginated transaction history by account ID
      */
-    getTransactionsByIdPaginated(accountId: number, page: number, size: number): Observable<Page<TransactionLog>> {
+    getTransactionsByIdPaginated(accountId: string, page: number, size: number): Observable<Page<TransactionLog>> {
         const params = new HttpParams()
             .set('page', page.toString())
             .set('size', size.toString())
@@ -124,7 +124,7 @@ export class AccountService {
     /**
      * Enrich transactions with computed type (DEBIT/CREDIT) based on current account
      */
-    private enrichTransactions(transactions: TransactionLog[], currentAccountId: number): TransactionLog[] {
+    private enrichTransactions(transactions: TransactionLog[], currentAccountId: string): TransactionLog[] {
         return transactions.map(tx => ({
             ...tx,
             // Add computed property if needed in the future
@@ -134,7 +134,7 @@ export class AccountService {
     /**
      * Determine if transaction is a debit or credit for given account
      */
-    getTransactionType(transaction: TransactionLog, accountId: number): 'DEBIT' | 'CREDIT' {
+    getTransactionType(transaction: TransactionLog, accountId: string): 'DEBIT' | 'CREDIT' {
         return transaction.fromAccountId === accountId ? 'DEBIT' : 'CREDIT';
     }
 }

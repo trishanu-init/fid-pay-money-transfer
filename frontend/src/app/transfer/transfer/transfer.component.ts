@@ -45,7 +45,7 @@ export class TransferComponent implements OnInit, OnDestroy {
         private router: Router
     ) {
         this.transferForm = this.fb.group({
-            toAccountId: ['', [Validators.required, Validators.pattern('^[0-9]+$')]],
+            toAccountId: ['', [Validators.required, Validators.pattern('^FIDPY[A-Z0-9]{6}$')]],
             amount: ['', [Validators.required, Validators.min(0.01)]]
         });
     }
@@ -90,7 +90,7 @@ export class TransferComponent implements OnInit, OnDestroy {
         const { toAccountId, amount } = this.transferForm.value;
 
         // Validate not transferring to self
-        if (parseInt(toAccountId) === this.account.accountId) {
+        if (toAccountId === this.account.accountId) {
             this.showError('Cannot transfer to your own account');
             return;
         }
@@ -104,7 +104,7 @@ export class TransferComponent implements OnInit, OnDestroy {
         // Open confirmation dialog
         const dialogRef = this.dialog.open(ConfirmTransferDialogComponent, {
             width: '400px',
-            data: { toAccountId: parseInt(toAccountId), amount: parseFloat(amount) }
+            data: { toAccountId, amount: parseFloat(amount) }
         });
 
         dialogRef.afterClosed().subscribe(confirmed => {
@@ -148,7 +148,7 @@ export class TransferComponent implements OnInit, OnDestroy {
 
         this.transferService.transfer(
             this.account.accountId,
-            parseInt(toAccountId),
+            toAccountId,
             parseFloat(amount)
         ).pipe(takeUntil(this.destroy$))
             .subscribe({

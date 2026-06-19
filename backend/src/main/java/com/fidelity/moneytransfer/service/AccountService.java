@@ -9,11 +9,11 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public interface AccountService {
-    AccountResponse getAccountDetails(Long accountId);
+    AccountResponse getAccountDetails(String accountId);
 
-    BigDecimal getBalance(Long accountId);
+    BigDecimal getBalance(String accountId);
 
-    List<TransactionLog> getTransactionHistory(Long accountId);
+    List<TransactionLog> getTransactionHistory(String accountId);
 
-    Page<TransactionLog> getTransactionHistory(Long accountId, Pageable pageable);
+    Page<TransactionLog> getTransactionHistory(String accountId, Pageable pageable);
 }

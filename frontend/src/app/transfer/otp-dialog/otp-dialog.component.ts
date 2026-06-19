@@ -6,7 +6,7 @@ import { takeUntil, take } from 'rxjs/operators';
 import { TransferService } from '../../core/services/transfer.service';
 
 export interface OtpDialogData {
-    accountId: number;
+    accountId: string;
     email?: string;
 }
 

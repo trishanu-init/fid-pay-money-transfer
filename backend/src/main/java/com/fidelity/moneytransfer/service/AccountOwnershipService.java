@@ -20,7 +20,7 @@ public class AccountOwnershipService {
      * @return The account if ownership is verified
      * @throws SecurityException if the user doesn't own the account
      */
-    public Account verifyAccountOwnership(Long accountId) {
+    public Account verifyAccountOwnership(String accountId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String authenticatedEmail = authentication.getName();
 

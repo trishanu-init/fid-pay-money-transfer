@@ -7,7 +7,7 @@ public record TransferResponse(
         UUID transactionId,
         String status,         // e.g., "SUCCESS" or "FAILED"
         String message,        // e.g., "Transfer completed successfully"
-        Long debitedFromAccountId,
-        Long creditedToAccountId,
+        String debitedFromAccountId,
+        String creditedToAccountId,
         BigDecimal amount
 ) {}

@@ -22,7 +22,7 @@ public class AccountServiceImpl implements AccountService {
     private final TransactionLogRepository transactionLogRepository;
 
     @Override
-    public AccountResponse getAccountDetails(Long accountId) {
+    public AccountResponse getAccountDetails(String accountId) {
         Account account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new AccountNotFoundException("Account not found"));
 
@@ -36,20 +36,20 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public BigDecimal getBalance(Long accountId) {
+    public BigDecimal getBalance(String accountId) {
         return accountRepository.findById(accountId)
                 .orElseThrow(() -> new AccountNotFoundException("Account not found"))
                 .getBalance();
     }
 
     @Override
-    public List<TransactionLog> getTransactionHistory(Long accountId) {
+    public List<TransactionLog> getTransactionHistory(String accountId) {
         // Fetches transactions where the user is EITHER the sender OR the receiver
         return transactionLogRepository.findByFromAccountIdOrToAccountIdOrderByCreatedOnDesc(accountId, accountId);
     }
 
     @Override
-    public Page<TransactionLog> getTransactionHistory(Long accountId, Pageable pageable) {
+    public Page<TransactionLog> getTransactionHistory(String accountId, Pageable pageable) {
         return transactionLogRepository.findByFromAccountIdOrToAccountIdOrderByCreatedOnDesc(accountId, accountId,
                 pageable);
     }

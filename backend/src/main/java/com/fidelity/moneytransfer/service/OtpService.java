@@ -35,7 +35,7 @@ public class OtpService {
      * @param accountId Account ID of the sender
      * @return OtpResponse with success status
      */
-    public OtpResponse generateAndSendOtpEmail(Long accountId) {
+    public OtpResponse generateAndSendOtpEmail(String accountId) {
         Account account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new AccountNotFoundException("Account not found"));
 
@@ -56,7 +56,7 @@ public class OtpService {
      * @param userOtp   OTP entered by user
      * @return OtpResponse with verification result
      */
-    public OtpResponse verifyTransferOtp(Long accountId, String userOtp) {
+    public OtpResponse verifyTransferOtp(String accountId, String userOtp) {
         String identifier = "transfer_" + accountId;
         String storedOtp = otpStorage.getOtp(identifier);
 

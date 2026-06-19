@@ -1,7 +1,7 @@
 package com.fidelity.moneytransfer.dto;
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 
 public record OtpRequest(
-        @NotNull(message = "Account ID is required") Long accountId) {
+        @NotBlank(message = "Account ID is required") String accountId) {
 }

@@ -25,7 +25,7 @@ export class TransferService {
      * @param accountId - Sender's account ID
      * @returns Observable with OTP response
      */
-    sendOtp(accountId: number): Observable<OtpResponse> {
+    sendOtp(accountId: string): Observable<OtpResponse> {
         const request: OtpRequest = { accountId };
         return this.http.post<OtpResponse>(`${this.otpUrl}/send-transfer`, request).pipe(
             tap(response => {
@@ -45,7 +45,7 @@ export class TransferService {
      * @param otp - OTP code entered by user
      * @returns Observable with verification response
      */
-    verifyOtp(accountId: number, otp: string): Observable<OtpResponse> {
+    verifyOtp(accountId: string, otp: string): Observable<OtpResponse> {
         const request: OtpVerifyRequest = { accountId, otp };
         return this.http.post<OtpResponse>(`${this.otpUrl}/verify-transfer`, request).pipe(
             tap(response => {
@@ -66,7 +66,7 @@ export class TransferService {
      * @param amount - Transfer amount (must be > 0)
      * @returns Observable with transfer response
      */
-    transfer(fromAccountId: number, toAccountId: number, amount: number): Observable<TransferResponse> {
+    transfer(fromAccountId: string, toAccountId: string, amount: number): Observable<TransferResponse> {
         const request: TransferRequest = {
             fromAccountId,
             toAccountId,

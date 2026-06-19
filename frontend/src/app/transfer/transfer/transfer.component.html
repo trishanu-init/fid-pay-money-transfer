@@ -62,8 +62,8 @@
                     <!-- To Account ID -->
                     <mat-form-field appearance="outline" class="full-width">
                         <mat-label>To Account ID</mat-label>
-                        <input matInput formControlName="toAccountId" placeholder="Enter recipient account number"
-                            type="text" inputmode="numeric" id="to-account-input">
+                        <input matInput formControlName="toAccountId" placeholder="Enter recipient account number (e.g. FIDPYA1B2C3)"
+                            autocomplete="off" id="recipient-account">
                         <mat-icon matPrefix>person</mat-icon>
                         <mat-error *ngIf="transferForm.get('toAccountId')?.invalid">
                             {{ getAccountError() }}

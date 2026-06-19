@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public record AccountResponse(
-                Long accountId,
+                String accountId,
                 String holderName,
                 String email,
                 BigDecimal balance,

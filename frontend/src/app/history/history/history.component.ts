@@ -30,7 +30,7 @@ export class HistoryComponent implements OnInit, OnDestroy, AfterViewInit {
     displayedColumns = ['createdOn', 'type', 'amount', 'status'];
     dataSource = new MatTableDataSource<TransactionLog>([]);
     allPageTransactions: TransactionLog[] = []; // All transactions for current page (before client filter)
-    currentAccountId: number | null = null;
+    currentAccountId: string | null = null;
     isLoading = true;
     errorMessage = '';
     isMobile = false;

@@ -2,7 +2,7 @@
  * Account model representing user account details
  */
 export interface Account {
-    accountId: number;
+    accountId: string;
     holderName: string;
     balance: number;
     status: AccountStatus;
@@ -16,8 +16,8 @@ export type AccountStatus = 'ACTIVE' | 'LOCKED' | 'CLOSED';
  */
 export interface TransactionLog {
     id: string;
-    fromAccountId: number;
-    toAccountId: number;
+    fromAccountId: string;
+    toAccountId: string;
     amount: number;
     status: TransactionStatus;
     failureReason?: string;
@@ -28,8 +28,8 @@ export interface TransactionLog {
 export type TransactionStatus = 'SUCCESS' | 'FAILED';
 
 export interface TransferRequest {
-    fromAccountId: number;
-    toAccountId: number;
+    fromAccountId: string;
+    toAccountId: string;
     amount: number;
     idempotencyKey: string;
 }
@@ -41,8 +41,8 @@ export interface TransferResponse {
     transactionId: string;
     status: string;
     message: string;
-    debitedFromAccountId: number;
-    creditedToAccountId: number;
+    debitedFromAccountId: string;
+    creditedToAccountId: string;
     amount: number;
 }
 
@@ -63,7 +63,7 @@ export interface AuthResponse {
     email: string;
     message: string;
     expiresIn: number;
-    accountId: number;
+    accountId: string;
 }
 
 /**
@@ -79,14 +79,14 @@ export interface ApiError {
  * OTP Request for sending OTP
  */
 export interface OtpRequest {
-    accountId: number;
+    accountId: string;
 }
 
 /**
  * OTP Verify Request
  */
 export interface OtpVerifyRequest {
-    accountId: number;
+    accountId: string;
     otp: string;
 }
 

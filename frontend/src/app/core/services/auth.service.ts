@@ -123,9 +123,8 @@ export class AuthService {
     /**
      * Get current user's account ID
      */
-    getCurrentUserId(): number | null {
-        const accountId = localStorage.getItem(this.ACCOUNT_ID_KEY);
-        return accountId ? parseInt(accountId, 10) : null;
+    getCurrentUserId(): string | null {
+        return localStorage.getItem(this.ACCOUNT_ID_KEY);
     }
 
     /**

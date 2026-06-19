@@ -44,12 +44,28 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         String hashedPassword = BCrypt.hashpw(accountDto.password(), BCrypt.gensalt());
         account.setPassword(hashedPassword);
 
+        // Generate a unique 6-character Base36 ID prefixed with FIDPY
+        String accountId;
+        do {
+            accountId = "FIDPY" + generateBase36Id();
+        } while (accountRepository.existsById(accountId));
+        account.setId(accountId);
+
         account.setBalance(new BigDecimal(0));
         account.setLastUpdated(LocalDateTime.now());
         account.setStatus(AccountStatus.ACTIVE);
 
-        log.info("User registered successfully: {}", accountDto.email());
+        log.info("User registered successfully: {} with account ID: {}", accountDto.email(), accountId);
         return accountRepository.save(account);
+    }
+
+    private String generateBase36Id() {
+        long min = 60466176L; // 36^5
+        long max = 2176782335L; // 36^6 - 1
+        long range = max - min + 1;
+        java.security.SecureRandom random = new java.security.SecureRandom();
+        long randomValue = min + (long) (random.nextDouble() * range);
+        return Long.toString(randomValue, 36).toUpperCase();
     }
 
     @Override

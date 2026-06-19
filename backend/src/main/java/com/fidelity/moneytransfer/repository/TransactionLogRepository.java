@@ -15,9 +15,9 @@ public interface TransactionLogRepository extends JpaRepository<TransactionLog, 
     // Custom query method to check if a transaction with this key already exists
     boolean existsByIdempotencyKey(String idempotencyKey);
 
-    List<TransactionLog> findByFromAccountIdOrToAccountIdOrderByCreatedOnDesc(Long fromAccountId, Long toAccountId);
+    List<TransactionLog> findByFromAccountIdOrToAccountIdOrderByCreatedOnDesc(String fromAccountId, String toAccountId);
 
     // Paginated query for transaction history
-    Page<TransactionLog> findByFromAccountIdOrToAccountIdOrderByCreatedOnDesc(Long fromAccountId, Long toAccountId,
+    Page<TransactionLog> findByFromAccountIdOrToAccountIdOrderByCreatedOnDesc(String fromAccountId, String toAccountId,
             Pageable pageable);
 }

@@ -26,7 +26,7 @@ public class AccountController {
     private final AccountOwnershipService accountOwnershipService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<AccountResponse> getAccountDetails(@PathVariable Long id) {
+    public ResponseEntity<AccountResponse> getAccountDetails(@PathVariable String id) {
         try {
             // Verify the authenticated user owns this account
             accountOwnershipService.verifyAccountOwnership(id);
@@ -39,7 +39,7 @@ public class AccountController {
     }
 
     @GetMapping("/{id}/balance")
-    public ResponseEntity<BigDecimal> getAccountBalance(@PathVariable Long id) {
+    public ResponseEntity<BigDecimal> getAccountBalance(@PathVariable String id) {
         try {
             // Verify the authenticated user owns this account
             accountOwnershipService.verifyAccountOwnership(id);
@@ -53,7 +53,7 @@ public class AccountController {
 
     @GetMapping("/{id}/transactions")
     public ResponseEntity<Page<TransactionLog>> getAccountTransactions(
-            @PathVariable Long id,
+            @PathVariable String id,
             @PageableDefault(size = 10, sort = "createdOn") Pageable pageable) {
         try {
             // Verify the authenticated user owns this account
