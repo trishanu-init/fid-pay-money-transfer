@@ -23,6 +23,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     account: Account | null = null;
     isLoading = true;
     errorMessage = '';
+    bannerGradient = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
     private destroy$ = new Subject<void>();
 
     constructor(
@@ -52,6 +53,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
             .subscribe({
                 next: (account) => {
                     this.account = account;
+                    this.bannerGradient = this.getGradientForId(account.accountId);
                     this.isLoading = false;
                 },
                 error: (error) => {
@@ -88,5 +90,31 @@ export class DashboardComponent implements OnInit, OnDestroy {
      */
     refresh(): void {
         this.loadAccountData();
+    }
+
+    /**
+     * Generate deterministic gradient based on account ID string
+     */
+    getGradientForId(id: string): string {
+        let hash1 = 0;
+        let hash2 = 0;
+        
+        // Compute first hash
+        for (let i = 0; i < id.length; i++) {
+            hash1 = id.charCodeAt(i) + ((hash1 << 5) - hash1);
+        }
+        
+        // Compute second hash using reversed ID
+        const reversed = id.split('').reverse().join('');
+        for (let i = 0; i < reversed.length; i++) {
+            hash2 = reversed.charCodeAt(i) + ((hash2 << 5) - hash2);
+        }
+        
+        const hue1 = Math.abs(hash1) % 360;
+        // Shift second color's hue by at least 40 degrees to guarantee a gradient contrast
+        const hue2 = (hue1 + 40 + (Math.abs(hash2) % 120)) % 360;
+        
+        // Output a custom linear gradient with fixed saturation and dark lightness for white text readability
+        return `linear-gradient(135deg, hsl(${hue1}, 75%, 42%) 0%, hsl(${hue2}, 70%, 38%) 100%)`;
     }
 }

@@ -48,7 +48,7 @@
         <!-- Dashboard Content -->
         <div class="dashboard-grid" *ngIf="!isLoading && !errorMessage && account">
             <!-- Welcome Banner -->
-            <div class="welcome-banner">
+            <div class="welcome-banner" [style.background]="bannerGradient">
                 <div class="welcome-text">
                     <span class="greeting">Welcome</span>
                     <h1 class="user-name">{{ account.holderName }}</h1>
