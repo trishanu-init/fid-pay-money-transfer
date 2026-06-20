@@ -18,7 +18,7 @@ class AccountTest {
     void setUp() {
         // Initialize a fresh active account before every test
         account = new Account();
-        account.setId(Long.valueOf(1L));
+        account.setId("FIDPY100001");
         account.setHolderName("John Doe");
         account.setEmail("john.doe@example.com");
         account.setBalance(new BigDecimal("1000.00"));

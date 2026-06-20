@@ -10,5 +10,6 @@ public record AccountResponse(
                 String email,
                 BigDecimal balance,
                 AccountStatus status,
-                LocalDateTime lastUpdated) {
+                LocalDateTime lastUpdated,
+                Integer rewardPoints) {
 }

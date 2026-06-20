@@ -9,6 +9,8 @@ import com.fidelity.moneytransfer.exception.AccountNotFoundException;
 import com.fidelity.moneytransfer.exception.DuplicateTransferException;
 import com.fidelity.moneytransfer.repository.AccountRepository;
 import com.fidelity.moneytransfer.repository.TransactionLogRepository;
+import com.fidelity.moneytransfer.repository.RewardRepository;
+import com.fidelity.moneytransfer.domain.RewardDetail;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,7 @@ public class TransferServiceImpl implements TransferService {
 
         private final AccountRepository accountRepository;
         private final TransactionLogRepository transactionLogRepository;
+        private final RewardRepository rewardRepository;
         private final EmailService emailService;
         private final TransactionTemplate transactionTemplate;
 
@@ -57,7 +60,32 @@ public class TransferServiceImpl implements TransferService {
                                 log.setIdempotencyKey(request.idempotencyKey());
                                 log.setCreatedOn(LocalDateTime.now());
 
-                                return transactionLogRepository.save(log);
+                                TransactionLog savedLog = transactionLogRepository.save(log);
+
+                                // Check reward eligibility
+                                // 1. Transaction status is SUCCESS (implicit in this block)
+                                // 2. Transaction amount is greater than 100
+                                // 3. Sender and receiver are different users (not self-transfer)
+                                if (request.amount().compareTo(new java.math.BigDecimal("100")) > 0
+                                        && !fromAccount.getId().equalsIgnoreCase(toAccount.getId())) {
+                                        
+                                        int points = request.amount().divide(new java.math.BigDecimal("100"), 0, java.math.RoundingMode.DOWN).intValue();
+                                        if (points > 0) {
+                                                fromAccount.setRewardPoints(fromAccount.getRewardPoints() + points);
+                                                accountRepository.save(fromAccount);
+
+                                                RewardDetail rewardDetail = RewardDetail.builder()
+                                                        .accountId(fromAccount.getId())
+                                                        .transactionId(savedLog.getId().toString())
+                                                        .pointsEarned(points)
+                                                        .transactionAmount(request.amount())
+                                                        .createdOn(LocalDateTime.now())
+                                                        .build();
+                                                rewardRepository.save(rewardDetail);
+                                        }
+                                }
+
+                                return savedLog;
                         });
 
                         Account sender = accountRepository.findById(request.fromAccountId()).orElseThrow();

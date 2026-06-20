@@ -32,7 +32,8 @@ public class AccountServiceImpl implements AccountService {
                 account.getEmail(),
                 account.getBalance(),
                 account.getStatus(),
-                account.getLastUpdated());
+                account.getLastUpdated(),
+                account.getRewardPoints());
     }
 
     @Override

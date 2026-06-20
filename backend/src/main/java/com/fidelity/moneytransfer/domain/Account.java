@@ -40,6 +40,9 @@ public class Account {
 
     private LocalDateTime lastUpdated;
 
+    @Column(name = "reward_points", nullable = false)
+    private Integer rewardPoints = 0;
+
     @PreUpdate
     public void updateTimestamp() {
         this.lastUpdated = LocalDateTime.now();

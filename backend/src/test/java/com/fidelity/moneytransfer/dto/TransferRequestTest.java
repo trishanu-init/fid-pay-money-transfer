@@ -26,8 +26,8 @@ class TransferRequestTest {
     @Test
     void testValidRequest() {
         TransferRequest request = new TransferRequest(
-                Long.valueOf(1L),
-                Long.valueOf(2L),
+                "FIDPY100001",
+                "FIDPY100002",
                 new BigDecimal("100.00"),
                 UUID.randomUUID().toString()
         );
@@ -41,8 +41,8 @@ class TransferRequestTest {
     void testInvalidAmount() {
         // Amount is negative (-100), which violates @DecimalMin
         TransferRequest request = new TransferRequest(
-                Long.valueOf(1L),
-                Long.valueOf(2L),
+                "FIDPY100001",
+                "FIDPY100002",
                 new BigDecimal("-100.00"),
                 UUID.randomUUID().toString()
         );
