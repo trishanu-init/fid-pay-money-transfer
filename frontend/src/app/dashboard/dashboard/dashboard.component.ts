@@ -86,6 +86,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
 
     /**
+     * Navigate to rewards details page
+     */
+    goToRewards(): void {
+        this.router.navigate(['/rewards']);
+    }
+
+    /**
      * Refresh account data
      */
     refresh(): void {

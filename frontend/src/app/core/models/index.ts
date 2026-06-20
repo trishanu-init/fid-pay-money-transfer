@@ -7,6 +7,7 @@ export interface Account {
     balance: number;
     status: AccountStatus;
     lastUpdated: string;
+    rewardPoints?: number;
 }
 
 export type AccountStatus = 'ACTIVE' | 'LOCKED' | 'CLOSED';
@@ -110,4 +111,17 @@ export interface Page<T> {
     first: boolean;
     last: boolean;
 }
+
+/**
+ * Reward detail log model
+ */
+export interface RewardDetail {
+    id: number;
+    accountId: string;
+    transactionId: string;
+    pointsEarned: number;
+    transactionAmount: number;
+    createdOn: string;
+}
+
 

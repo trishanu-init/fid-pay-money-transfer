@@ -34,6 +34,11 @@ const routes: Routes = [
     canActivate: [AuthGuard]
   },
   {
+    path: 'rewards',
+    loadChildren: () => import('./rewards/rewards.module').then(m => m.RewardsModule),
+    canActivate: [AuthGuard]
+  },
+  {
     path: '**',
     redirectTo: 'dashboard'
   }

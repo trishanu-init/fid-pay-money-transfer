@@ -53,6 +53,13 @@
                     <span class="greeting">Welcome</span>
                     <h1 class="user-name">{{ account.holderName }}</h1>
                 </div>
+                <div class="welcome-rewards" (click)="goToRewards()" matTooltip="View rewards details" matRipple>
+                    <mat-icon class="coin-icon">monetization_on</mat-icon>
+                    <div class="rewards-info">
+                        <span class="rewards-points">{{ account.rewardPoints || 0 }}</span>
+                        <span class="rewards-label">Points</span>
+                    </div>
+                </div>
             </div>
 
             <!-- Balance Card -->
@@ -101,6 +108,17 @@
                             </div>
                             <h3 class="action-title">Transaction History</h3>
                             <p class="action-description">View all your past transactions</p>
+                        </mat-card-content>
+                    </mat-card>
+
+                    <!-- My Rewards -->
+                    <mat-card class="action-card card-hover" (click)="goToRewards()" matRipple id="rewards-action">
+                        <mat-card-content>
+                            <div class="action-icon rewards-icon">
+                                <mat-icon>emoji_events</mat-icon>
+                            </div>
+                            <h3 class="action-title">My Rewards</h3>
+                            <p class="action-description">Track points and eligible transactions</p>
                         </mat-card-content>
                     </mat-card>
                 </div>

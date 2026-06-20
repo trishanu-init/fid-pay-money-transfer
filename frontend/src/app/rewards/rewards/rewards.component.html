@@ -1,0 +1,140 @@
+<div class="rewards-container">
+    <!-- Header/Toolbar -->
+    <mat-toolbar class="app-toolbar" color="primary">
+        <div class="toolbar-content">
+            <div class="toolbar-left">
+                <button mat-icon-button (click)="goBack()" matTooltip="Back to Dashboard" aria-label="Back">
+                    <mat-icon>arrow_back</mat-icon>
+                </button>
+                <span class="toolbar-title">My Rewards</span>
+            </div>
+            <div class="toolbar-right">
+                <button mat-icon-button (click)="refresh()" matTooltip="Refresh" aria-label="Refresh data">
+                    <mat-icon>refresh</mat-icon>
+                </button>
+            </div>
+        </div>
+    </mat-toolbar>
+
+    <!-- Main Content -->
+    <main class="rewards-content">
+        <!-- Loading State -->
+        <app-loading-spinner *ngIf="isLoading" message="Loading your rewards..."></app-loading-spinner>
+
+        <!-- Error State -->
+        <mat-card class="error-card" *ngIf="errorMessage && !isLoading">
+            <mat-card-content>
+                <mat-icon color="warn">error_outline</mat-icon>
+                <h3>Unable to load rewards</h3>
+                <p>{{ errorMessage }}</p>
+                <button mat-raised-button color="primary" (click)="refresh()">
+                    <mat-icon>refresh</mat-icon>
+                    Try Again
+                </button>
+            </mat-card-content>
+        </mat-card>
+
+        <!-- Rewards Grid & History -->
+        <div class="rewards-grid-wrapper" *ngIf="!isLoading && !errorMessage">
+            <!-- Top Dashboard Stats & Rules -->
+            <div class="rewards-top-row">
+                <!-- Program Info & Coin Badge Unified Card -->
+                <mat-card class="info-card-unified">
+                    <mat-card-content class="info-card-content-unified">
+                        <div class="rules-left">
+                            <mat-icon class="rule-icon info">stars</mat-icon>
+                            <span class="rules-text-simple">
+                                <strong>Rewards Program Rules:</strong> Earn 1 point per ₹100 on successful transfers above ₹100 to other accounts (rounded down).
+                            </span>
+                        </div>
+                        <div class="rewards-badge-right" matTooltip="Total rewards earned" matRipple>
+                            <mat-icon class="coin-icon">monetization_on</mat-icon>
+                            <div class="rewards-info">
+                                <span class="rewards-points">{{ rewardPoints }}</span>
+                                <span class="rewards-label">Points</span>
+                            </div>
+                        </div>
+                    </mat-card-content>
+                </mat-card>
+            </div>
+
+            <!-- Reward History Section -->
+            <div class="history-section">
+                <h2 class="section-title">Rewards Log</h2>
+
+                <!-- Empty State -->
+                <div class="empty-state" *ngIf="rewardHistory.length === 0">
+                    <div class="empty-icon-container">
+                        <mat-icon>stars</mat-icon>
+                    </div>
+                    <h3>No rewards earned yet</h3>
+                    <p>Make your first eligible transfer to start earning points!</p>
+                    <button mat-raised-button color="primary" (click)="goBack()">
+                        <mat-icon>arrow_back</mat-icon>
+                        Back to Dashboard
+                    </button>
+                </div>
+
+                <!-- Desktop Table View -->
+                <div class="table-container mat-elevation-z1" *ngIf="rewardHistory.length > 0 && !isMobile">
+                    <table mat-table [dataSource]="dataSource" class="rewards-table">
+                        <!-- Date Column -->
+                        <ng-container matColumnDef="createdOn">
+                            <th mat-header-cell *matHeaderCellDef>Date & Time</th>
+                            <td mat-cell *matCellDef="let log">
+                                {{ log.createdOn | date:'medium' }}
+                            </td>
+                        </ng-container>
+
+                        <!-- Transaction ID Column -->
+                        <ng-container matColumnDef="transactionId">
+                            <th mat-header-cell *matHeaderCellDef>Transaction ID</th>
+                            <td mat-cell *matCellDef="let log" class="mono-text">
+                                {{ log.transactionId }}
+                            </td>
+                        </ng-container>
+
+                        <!-- Transaction Amount Column -->
+                        <ng-container matColumnDef="transactionAmount">
+                            <th mat-header-cell *matHeaderCellDef>Transfer Amount</th>
+                            <td mat-cell *matCellDef="let log">
+                                ₹{{ log.transactionAmount | appCurrency:false }}
+                            </td>
+                        </ng-container>
+
+                        <!-- Points Earned Column -->
+                        <ng-container matColumnDef="pointsEarned">
+                            <th mat-header-cell *matHeaderCellDef class="number-align">Points Credited</th>
+                            <td mat-cell *matCellDef="let log" class="number-align points-cell">
+                                <span class="points-badge">+{{ log.pointsEarned }} pts</span>
+                            </td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                    </table>
+                </div>
+
+                <!-- Mobile Card List View -->
+                <div class="mobile-card-list" *ngIf="rewardHistory.length > 0 && isMobile">
+                    <mat-card class="mobile-reward-card" *ngFor="let log of rewardHistory">
+                        <mat-card-content>
+                            <div class="mobile-card-header">
+                                <span class="mobile-card-date">{{ log.createdOn | date:'short' }}</span>
+                                <span class="points-badge">+{{ log.pointsEarned }} pts</span>
+                            </div>
+                            <div class="mobile-card-detail">
+                                <span class="label">Amount:</span>
+                                <span class="value font-semibold">₹{{ log.transactionAmount | appCurrency:false }}</span>
+                            </div>
+                            <div class="mobile-card-detail">
+                                <span class="label">Txn ID:</span>
+                                <span class="value mono-text">{{ log.transactionId }}</span>
+                            </div>
+                        </mat-card-content>
+                    </mat-card>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
