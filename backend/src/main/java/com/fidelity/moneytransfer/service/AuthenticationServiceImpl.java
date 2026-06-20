@@ -82,9 +82,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new RuntimeException("Invalid email or password");
         }
 
+        if (account.getStatus() == AccountStatus.DISABLED) {
+            log.warn("Login attempt blocked: Account is disabled for email: {}", email);
+            throw new RuntimeException("Account is disabled. Please contact support.");
+        }
+
         log.info("User logged in successfully: {}", email);
         // Generate JWT token if credentials are valid
-        return jwtUtil.generateToken(email);
+        return jwtUtil.generateToken(email, account.getRole().name());
     }
 
     @Override
@@ -99,6 +104,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         if (!BCrypt.checkpw(password, account.getPassword())) {
             log.warn("Failed login attempt for email: {}", email);
             throw new RuntimeException("Invalid email or password");
+        }
+
+        if (account.getStatus() == AccountStatus.DISABLED) {
+            log.warn("Login attempt blocked: Account is disabled for email: {}", email);
+            throw new RuntimeException("Account is disabled. Please contact support.");
         }
 
         log.info("User logged in successfully with account ID: {}", account.getId());

@@ -19,6 +19,7 @@ export class AuthService {
     private readonly EMAIL_KEY = 'user_email';
     private readonly ACCOUNT_ID_KEY = 'account_id';
     private readonly EXPIRATION_KEY = 'token_expiration';
+    private readonly ROLE_KEY = 'user_role';
 
     private isAuthenticatedSubject = new BehaviorSubject<boolean>(this.hasValidToken());
 
@@ -65,6 +66,7 @@ export class AuthService {
         localStorage.removeItem(this.EMAIL_KEY);
         localStorage.removeItem(this.ACCOUNT_ID_KEY);
         localStorage.removeItem(this.EXPIRATION_KEY);
+        localStorage.removeItem(this.ROLE_KEY);
         this.isAuthenticatedSubject.next(false);
         this.router.navigate(['/login']);
     }
@@ -84,6 +86,7 @@ export class AuthService {
         localStorage.setItem(this.EMAIL_KEY, response.email);
         localStorage.setItem(this.ACCOUNT_ID_KEY, response.accountId.toString());
         localStorage.setItem(this.EXPIRATION_KEY, (Date.now() + response.expiresIn).toString());
+        localStorage.setItem(this.ROLE_KEY, response.role || 'USER');
         this.isAuthenticatedSubject.next(true);
     }
 
@@ -125,6 +128,20 @@ export class AuthService {
      */
     getCurrentUserId(): string | null {
         return localStorage.getItem(this.ACCOUNT_ID_KEY);
+    }
+
+    /**
+     * Get current user's role
+     */
+    getUserRole(): string | null {
+        return localStorage.getItem(this.ROLE_KEY);
+    }
+
+    /**
+     * Check if current user is an admin
+     */
+    isAdmin(): boolean {
+        return this.getUserRole() === 'ADMIN';
     }
 
     /**

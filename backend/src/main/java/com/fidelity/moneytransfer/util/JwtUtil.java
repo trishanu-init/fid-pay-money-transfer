@@ -35,16 +35,21 @@ public class JwtUtil {
         log.info("JWT utility initialized with expiration: {} ms", expirationMs);
     }
 
-    public String generateToken(String username) {
+    public String generateToken(String username, String role) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expirationMs);
 
         return Jwts.builder()
                 .setSubject(username)
+                .claim("role", role)
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
                 .signWith(secretKey, SignatureAlgorithm.HS512)
                 .compact();
+    }
+
+    public String extractRole(String token) {
+        return getClaimsFromToken(token).get("role", String.class);
     }
 
     public String extractUsername(String token) {

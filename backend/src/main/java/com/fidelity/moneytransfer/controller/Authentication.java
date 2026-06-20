@@ -54,6 +54,7 @@ public class Authentication {
             response.setMessage("Login successful");
             response.setExpiresIn(tokenExpirationMs);
             response.setAccountId(account.getId());
+            response.setRole(account.getRole().name());
             
             log.info("Login successful for email: {}", loginRequest.getEmail());
             return ResponseEntity.ok(response);

@@ -43,6 +43,10 @@ public class Account {
     @Column(name = "reward_points", nullable = false)
     private Integer rewardPoints = 0;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private AccountRole role = AccountRole.USER;
+
     @PreUpdate
     public void updateTimestamp() {
         this.lastUpdated = LocalDateTime.now();

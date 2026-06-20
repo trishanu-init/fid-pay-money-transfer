@@ -34,11 +34,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             if (StringUtils.hasText(token) && jwtUtil.validateToken(token)) {
                 String username = jwtUtil.extractUsername(token);
+                String role = jwtUtil.extractRole(token);
+                if (role == null) {
+                    role = "USER";
+                }
                 UsernamePasswordAuthenticationToken authentication = 
                     new UsernamePasswordAuthenticationToken(username, null, 
-                        List.of(new SimpleGrantedAuthority("ROLE_USER")));
+                        List.of(new SimpleGrantedAuthority("ROLE_" + role)));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-                log.info("JWT token validated for user: {}", username);
+                log.info("JWT token validated for user: {} with role: {}", username, role);
             }
         } catch (JwtException e) {
             log.error("JWT validation failed: {}", e.getMessage());

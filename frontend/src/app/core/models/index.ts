@@ -8,9 +8,10 @@ export interface Account {
     status: AccountStatus;
     lastUpdated: string;
     rewardPoints?: number;
+    role?: string;
 }
 
-export type AccountStatus = 'ACTIVE' | 'LOCKED' | 'CLOSED';
+export type AccountStatus = 'ACTIVE' | 'LOCKED' | 'CLOSED' | 'DISABLED';
 
 /**
  * Transaction log model for transaction history
@@ -65,6 +66,7 @@ export interface AuthResponse {
     message: string;
     expiresIn: number;
     accountId: string;
+    role?: string;
 }
 
 /**
