@@ -37,4 +37,8 @@ public class TransactionLog {
 
     @Builder.Default
     private LocalDateTime createdOn = LocalDateTime.now();
+
+    @Column(nullable = false)
+    @Builder.Default
+    private String message = "N/A";
 }

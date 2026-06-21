@@ -46,7 +46,8 @@ export class TransferComponent implements OnInit, OnDestroy {
     ) {
         this.transferForm = this.fb.group({
             toAccountId: ['', [Validators.required, Validators.pattern('^FIDPY[A-Z0-9]{6}$')]],
-            amount: ['', [Validators.required, Validators.min(0.01)]]
+            amount: ['', [Validators.required, Validators.min(0.01)]],
+            message: ['', [Validators.maxLength(255)]]
         });
     }
 
@@ -87,7 +88,7 @@ export class TransferComponent implements OnInit, OnDestroy {
             return;
         }
 
-        const { toAccountId, amount } = this.transferForm.value;
+        const { toAccountId, amount, message } = this.transferForm.value;
 
         // Validate not transferring to self
         if (toAccountId === this.account.accountId) {
@@ -104,7 +105,7 @@ export class TransferComponent implements OnInit, OnDestroy {
         // Open confirmation dialog
         const dialogRef = this.dialog.open(ConfirmTransferDialogComponent, {
             width: '400px',
-            data: { toAccountId, amount: parseFloat(amount) }
+            data: { toAccountId, amount: parseFloat(amount), message }
         });
 
         dialogRef.afterClosed().subscribe(confirmed => {
@@ -144,12 +145,13 @@ export class TransferComponent implements OnInit, OnDestroy {
         if (!this.account) return;
 
         this.isSubmitting = true;
-        const { toAccountId, amount } = this.transferForm.value;
+        const { toAccountId, amount, message } = this.transferForm.value;
 
         this.transferService.transfer(
             this.account.accountId,
             toAccountId,
-            parseFloat(amount)
+            parseFloat(amount),
+            message
         ).pipe(takeUntil(this.destroy$))
             .subscribe({
                 next: (response) => {

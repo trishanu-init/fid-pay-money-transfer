@@ -117,6 +117,9 @@
                                         }}</mat-icon>
                                     {{ getTransactionType(tx) }}
                                 </span>
+                                <div class="tx-message-note" *ngIf="tx.message && tx.message !== 'N/A'">
+                                    Note: "{{ tx.message }}"
+                                </div>
                             </td>
                         </ng-container>
 
@@ -212,6 +215,9 @@
                     <div class="tx-card-details">
                         <span *ngIf="getTransactionType(tx) === 'DEBIT'">To: Account #{{ tx.toAccountId }}</span>
                         <span *ngIf="getTransactionType(tx) === 'CREDIT'">From: Account #{{ tx.fromAccountId }}</span>
+                        <div class="tx-card-message" *ngIf="tx.message && tx.message !== 'N/A'">
+                            Note: "{{ tx.message }}"
+                        </div>
                     </div>
                 </mat-card-content>
             </mat-card>

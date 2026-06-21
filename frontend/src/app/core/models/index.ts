@@ -24,6 +24,7 @@ export interface TransactionLog {
     failureReason?: string;
     idempotencyKey: string;
     createdOn: string;
+    message?: string;
 }
 
 export type TransactionStatus = 'SUCCESS' | 'FAILED';
@@ -33,6 +34,7 @@ export interface TransferRequest {
     toAccountId: string;
     amount: number;
     idempotencyKey: string;
+    message?: string;
 }
 
 /**

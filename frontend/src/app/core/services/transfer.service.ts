@@ -66,12 +66,13 @@ export class TransferService {
      * @param amount - Transfer amount (must be > 0)
      * @returns Observable with transfer response
      */
-    transfer(fromAccountId: string, toAccountId: string, amount: number): Observable<TransferResponse> {
+    transfer(fromAccountId: string, toAccountId: string, amount: number, message?: string): Observable<TransferResponse> {
         const request: TransferRequest = {
             fromAccountId,
             toAccountId,
             amount,
-            idempotencyKey: this.generateIdempotencyKey()
+            idempotencyKey: this.generateIdempotencyKey(),
+            message: message || undefined
         };
 
         return this.http.post<TransferResponse>(this.baseUrl, request).pipe(

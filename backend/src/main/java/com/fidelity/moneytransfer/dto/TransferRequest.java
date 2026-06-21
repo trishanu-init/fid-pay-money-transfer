@@ -17,5 +17,7 @@ public record TransferRequest(
         BigDecimal amount,
 
         @NotBlank(message = "Idempotency key is required")
-        String idempotencyKey
+        String idempotencyKey,
+
+        String message
 ) {}

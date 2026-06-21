@@ -29,7 +29,8 @@ class TransferRequestTest {
                 "FIDPY100001",
                 "FIDPY100002",
                 new BigDecimal("100.00"),
-                UUID.randomUUID().toString()
+                UUID.randomUUID().toString(),
+                "Payment for services"
         );
 
         Set<ConstraintViolation<TransferRequest>> violations = validator.validate(request);
@@ -44,7 +45,8 @@ class TransferRequestTest {
                 "FIDPY100001",
                 "FIDPY100002",
                 new BigDecimal("-100.00"),
-                UUID.randomUUID().toString()
+                UUID.randomUUID().toString(),
+                null
         );
 
         Set<ConstraintViolation<TransferRequest>> violations = validator.validate(request);
@@ -55,7 +57,7 @@ class TransferRequestTest {
 
     @Test
     void testNullFields() {
-        TransferRequest request = new TransferRequest(null, null, null, null);
+        TransferRequest request = new TransferRequest(null, null, null, null, null);
 
         Set<ConstraintViolation<TransferRequest>> violations = validator.validate(request);
 

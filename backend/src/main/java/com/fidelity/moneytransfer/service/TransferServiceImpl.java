@@ -59,6 +59,9 @@ public class TransferServiceImpl implements TransferService {
                                 log.setStatus(TransactionStatus.SUCCESS);
                                 log.setIdempotencyKey(request.idempotencyKey());
                                 log.setCreatedOn(LocalDateTime.now());
+                                if (request.message() != null && !request.message().trim().isEmpty()) {
+                                        log.setMessage(request.message().trim());
+                                }
 
                                 TransactionLog savedLog = transactionLogRepository.save(log);
 
@@ -145,6 +148,9 @@ public class TransferServiceImpl implements TransferService {
                                 failLog.setStatus(TransactionStatus.FAILED);
                                 failLog.setIdempotencyKey(request.idempotencyKey());
                                 failLog.setCreatedOn(LocalDateTime.now());
+                                if (request.message() != null && !request.message().trim().isEmpty()) {
+                                        failLog.setMessage(request.message().trim());
+                                }
 
                                 String errorMsg = e.getMessage() != null ? e.getMessage() : "Unknown Error";
                                 if (errorMsg.length() > 255) {

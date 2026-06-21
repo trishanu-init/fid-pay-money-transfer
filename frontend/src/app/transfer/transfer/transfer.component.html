@@ -81,6 +81,14 @@
                         </mat-error>
                     </mat-form-field>
 
+                    <!-- Message (Optional) -->
+                    <mat-form-field appearance="outline" class="full-width">
+                        <mat-label>Message (Optional)</mat-label>
+                        <textarea matInput formControlName="message" placeholder="Add a note (e.g. Rent, Dinner, etc.)" rows="2" maxlength="255" id="message-input"></textarea>
+                        <mat-icon matPrefix>chat_bubble_outline</mat-icon>
+                        <mat-hint align="end">{{transferForm.get('message')?.value?.length || 0}}/255</mat-hint>
+                    </mat-form-field>
+
                     <!-- Action Buttons -->
                     <div class="form-actions">
                         <button mat-button type="button" (click)="cancel()" [disabled]="isSubmitting"

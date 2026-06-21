@@ -4,6 +4,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 export interface ConfirmDialogData {
     toAccountId: string;
     amount: number;
+    message?: string;
 }
 
 /**
@@ -27,6 +28,10 @@ export interface ConfirmDialogData {
           <div class="account-display">
             <mat-icon>account_circle</mat-icon>
             <span>Account: {{ data.toAccountId }}</span>
+          </div>
+          <div class="message-display" *ngIf="data.message">
+            <mat-icon>chat_bubble_outline</mat-icon>
+            <span>Note: "{{ data.message }}"</span>
           </div>
         </div>
         <p class="confirm-warning">
@@ -91,6 +96,22 @@ export interface ConfirmDialogData {
         font-size: 20px;
         width: 20px;
         height: 20px;
+      }
+    }
+
+    .message-display {
+      margin-top: var(--spacing-sm);
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      color: var(--text-secondary);
+      font-size: 0.813rem;
+      font-style: italic;
+
+      mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
       }
     }
     
