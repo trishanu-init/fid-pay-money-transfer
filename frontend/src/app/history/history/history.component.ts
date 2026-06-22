@@ -27,7 +27,7 @@ export type TransactionFilter = 'all' | 'sent' | 'received';
     styleUrls: ['./history.component.scss']
 })
 export class HistoryComponent implements OnInit, OnDestroy, AfterViewInit {
-    displayedColumns = ['createdOn', 'type', 'amount', 'status'];
+    displayedColumns = ['createdOn', 'type', 'message', 'amount', 'status'];
     dataSource = new MatTableDataSource<TransactionLog>([]);
     allPageTransactions: TransactionLog[] = []; // All transactions for current page (before client filter)
     currentAccountId: string | null = null;

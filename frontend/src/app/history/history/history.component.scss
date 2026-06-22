@@ -414,11 +414,21 @@
     border-top: 1px solid rgba(0, 0, 0, 0.08);
 }
 
-.tx-message-note {
-    font-size: 0.75rem;
+.tx-message-text {
+    font-size: 0.813rem;
     color: var(--text-secondary);
     font-style: italic;
-    margin-top: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.tx-message-placeholder {
+    color: var(--text-disabled);
+    opacity: 0.5;
 }
 
 .tx-card-message {
