@@ -1,0 +1,46 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: money-transfer-system
+
+  datasource:
+    # Update this URL if your database name or port is different
+    url: jdbc:mysql://localhost:3306/money_transfer_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
+    username: YOUR_DB_USERNAME  # e.g., root
+    password: YOUR_DB_PASSWORD  # e.g., root123
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: YOUR_EMAIL@gmail.com
+    password: YOUR_GMAIL_APP_PASSWORD # Generate this at Google Account -> Security -> App Passwords
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+  # Default Security Credentials for Local Testing
+  security:
+    user:
+      name: 
+      password: 
+      roles: USER
+
+# Custom Application Properties
+app:
+  notification:
+    test-recipient: "recipient@example.com" # The email that receives test notifications

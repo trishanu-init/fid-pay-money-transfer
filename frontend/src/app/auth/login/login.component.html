@@ -1,0 +1,102 @@
+<div class="login-container">
+  <!-- Background decoration -->
+  <div class="bg-decoration">
+    <div class="circle circle-1"></div>
+    <div class="circle circle-2"></div>
+    <div class="circle circle-3"></div>
+  </div>
+
+  <!-- Login Card -->
+  <mat-card class="login-card">
+    <mat-card-content>
+      <!-- Logo & Title -->
+      <div class="login-header">
+        <div class="logo-container">
+        </div>
+        <h1 class="app-title">Fid-Pay</h1>
+        <p class="app-subtitle">Money Transfer System</p>
+      </div>
+
+      <!-- Error Alert -->
+      <div class="error-alert" *ngIf="errorMessage" role="alert">
+        <mat-icon>error_outline</mat-icon>
+        <span>{{ errorMessage }}</span>
+      </div>
+
+      <!-- Login Form -->
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+        <!-- Email Field -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Email</mat-label>
+          <input
+            matInput
+            formControlName="email"
+            placeholder="Enter your email"
+            autocomplete="email"
+            id="email"
+            type="email">
+          <mat-icon matPrefix>mail</mat-icon>
+          <mat-error *ngIf="loginForm.get('email')?.invalid">
+            {{ getEmailError() }}
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Password Field -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Password</mat-label>
+          <input
+            matInput
+            [type]="hidePassword ? 'password' : 'text'"
+            formControlName="password"
+            placeholder="Enter your password"
+            autocomplete="current-password"
+            id="password">
+          <mat-icon matPrefix>lock</mat-icon>
+          <button
+            mat-icon-button
+            matSuffix
+            type="button"
+            (click)="hidePassword = !hidePassword"
+            [attr.aria-label]="hidePassword ? 'Show password' : 'Hide password'"
+            [attr.aria-pressed]="!hidePassword">
+            <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          <mat-error *ngIf="loginForm.get('password')?.invalid">
+            {{ getPasswordError() }}
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Forgot Password Link -->
+        <div class="forgot-password-container">
+          <a type="button" class="forgot-password-link" (click)="openForgotPasswordDialog()" id="forgot-password-link">
+            Forgot Password?
+          </a>
+        </div>
+
+        <!-- Submit Button -->
+        <button
+          mat-raised-button
+          color="primary"
+          type="submit"
+          class="login-button"
+          [disabled]="isLoading"
+          id="login-button">
+          <mat-icon *ngIf="!isLoading">login</mat-icon>
+          <mat-spinner *ngIf="isLoading" diameter="20"></mat-spinner>
+          <span>{{ isLoading ? 'Signing in...' : 'Sign In' }}</span>
+        </button>
+      </form>
+      <div class="demo-credentials">
+        <mat-divider></mat-divider>
+        <p class="demo-hint">
+          Do not have an account? <a href="/login/register" class="link">Register here</a>
+        </p>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Footer -->
+  <p class="login-footer">
+    &copy; 2026 Capstone Project Group-1 Batch_3 EGL.
+  </p>
+</div>
