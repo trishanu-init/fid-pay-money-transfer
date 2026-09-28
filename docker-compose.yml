@@ -1,0 +1,79 @@
+version: '3.9'
+
+services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: money-transfer-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: money_transfer_db
+      MYSQL_USER: moneytransfer
+      MYSQL_PASSWORD: moneytransfer123
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./backend/src/main/resources/data.sql:/docker-entrypoint-initdb.d/02-data.sql
+    networks:
+      - money-transfer-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 5s
+      retries: 10
+      interval: 10s
+
+  # Spring Boot Backend
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: money-transfer-backend
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/money_transfer_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: moneytransfer
+      SPRING_DATASOURCE_PASSWORD: moneytransfer123
+      SPRING_MAIL_HOST: smtp.gmail.com
+      SPRING_MAIL_PORT: 587
+      SPRING_MAIL_USERNAME: noreply.hackblaze@gmail.com
+      SPRING_MAIL_PASSWORD: "ctml ccux jgaw qhmh"
+      SERVER_PORT: 9890
+    ports:
+      - "9890:9890"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - money-transfer-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9890/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Angular Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: money-transfer-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - money-transfer-network
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+
+volumes:
+  mysql_data:
+    driver: local
+
+networks:
+  money-transfer-network:
+    driver: bridge
